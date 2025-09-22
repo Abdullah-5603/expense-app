@@ -1,9 +1,13 @@
-// Global styles: Clean, minimal design
+// Global variables (shared across blocks)
 $primary-color: #007bff;
 $danger-color: #d9534f;
 $success-color: #5cb85c;
 $border-color: #ddd;
+$background-light: #f8f9fa;
+$text-muted: #666;
+$shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 
+// Reset and base styles (not BEM, but foundational)
 * {
   box-sizing: border-box;
 }
@@ -12,26 +16,29 @@ body {
   margin: 0;
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background-color: #f8f9fa;
+  background-color: $background-light;
   color: #333;
 }
 
+// BEM Block: dashboard (main container)
 .dashboard {
   max-width: 800px;
   margin: 0 auto;
   background: white;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: $shadow;
 }
 
-h1 {
+// BEM Element: dashboard__title
+.dashboard__title {
   text-align: center;
   color: $primary-color;
   margin-bottom: 20px;
 }
 
-.total {
+// BEM Element: dashboard__total
+.dashboard__total {
   font-size: 2.5em;
   font-weight: bold;
   color: $danger-color;
@@ -43,79 +50,149 @@ h1 {
   border-left: 5px solid $danger-color;
 }
 
-select {
+// BEM Block: month-selector (monthly navigation)
+.month-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+// BEM Element: month-selector__button
+.month-selector__button {
+  padding: 10px 15px;
+  border: 1px solid $border-color;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(.month-selector__button--disabled) {
+    background: #f5f5f5;
+  }
+}
+
+// BEM Element: month-selector__select
+.month-selector__select {
   display: block;
-  margin: 0 auto 20px;
   padding: 10px;
   font-size: 1em;
   border: 1px solid $border-color;
   border-radius: 4px;
   background: white;
+  min-width: 200px;
+  margin: 0;
 }
 
+// BEM Block: monthly-summary (monthly stats)
+.monthly-summary {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+// BEM Element: monthly-summary__title
+.monthly-summary__title {
+  color: $primary-color;
+  margin-bottom: 20px;
+}
+
+// BEM Element: monthly-summary__stats
+.monthly-summary__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+// BEM Element: monthly-summary__stat
+.monthly-summary__stat {
+  background: $background-light;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid $primary-color;
+}
+
+// BEM Element: monthly-summary__stat-label
+.monthly-summary__stat-label {
+  display: block;
+  font-size: 0.9em;
+  color: $text-muted;
+  margin-bottom: 5px;
+}
+
+// BEM Element: monthly-summary__stat-value
+.monthly-summary__stat-value {
+  display: block;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: $danger-color;
+}
+
+// BEM Block: expense-form (form for add/edit)
 .expense-form {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-bottom: 30px;
+}
 
-  input {
-    padding: 12px;
-    border: 1px solid $border-color;
-    border-radius: 4px;
-    font-size: 1em;
-  }
+// BEM Element: expense-form__input
+.expense-form__input {
+  padding: 12px;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  font-size: 1em;
 
-  button {
-    padding: 12px;
-    border: none;
-    border-radius: 4px;
-    font-size: 1em;
-    cursor: pointer;
-    transition: background-color 0.2s;
-
-    &:first-of-type {
-      background: $primary-color;
-      color: white;
-    }
-
-    &:last-of-type {
-      background: #6c757d;
-      color: white;
-    }
-
-    &:hover {
-      opacity: 0.9;
-    }
-  }
-
-  @media (min-width: 600px) {
-    flex-direction: row;
-    align-items: end;
-
-    input {
-      flex: 1;
-      margin-right: 10px;
-    }
-
-    input:last-of-type {
-      margin-right: 0;
-    }
-
-    button {
-      flex-shrink: 0;
-      white-space: nowrap;
-    }
+  &--date {
+    // Modifier for date input if needed
   }
 }
 
+// BEM Element: expense-form__button
+.expense-form__button {
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &--primary {
+    background: $primary-color;
+    color: white;
+  }
+
+  &--secondary {
+    background: #6c757d;
+    color: white;
+  }
+
+  &--cancel {
+    background: #6c757d;
+    color: white;
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+// BEM Block: expense-list (container for list)
 .expense-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.expense-item {
+// BEM Element: expense-list__item (monthly variant)
+.expense-list__item {
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -124,78 +201,141 @@ select {
   border-radius: 4px;
   margin-bottom: 10px;
   background: #fafafa;
+}
 
-  .details {
+// BEM Element: expense-list__details
+.expense-list__details {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+
+  // Monthly-specific sub-elements
+  .expense-list__date {
+    min-width: 60px;
+    text-align: center;
+    font-weight: bold;
+    color: $text-muted;
+    background: #f0f0f0;
+    padding: 5px;
+    border-radius: 4px;
+  }
+
+  .expense-list__info {
+    flex: 1;
     display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
+    flex-direction: column;
+    gap: 2px;
 
-    span {
+    .expense-list__name {
       font-weight: 500;
     }
 
-    .amount {
-      color: $danger-color;
-      font-weight: bold;
-    }
-
-    .category {
+    .expense-list__category {
+      font-size: 0.9em;
+      color: $text-muted;
       background: $primary-color;
       color: white;
       padding: 4px 8px;
       border-radius: 3px;
-      font-size: 0.9em;
     }
   }
 
-  .actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
+  .expense-list__amount {
+    color: $danger-color;
+    font-weight: bold;
+    min-width: 80px;
+    text-align: right;
+  }
+}
 
-    button {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9em;
-      transition: background-color 0.2s;
+// BEM Element: expense-list__actions
+.expense-list__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}
 
-      &:first-of-type {
-        background: $success-color;
-        color: white;
-      }
+// BEM Element: expense-list__action-button
+.expense-list__action-button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: opacity 0.2s;
+
+  &--edit {
+    background: $success-color;
+    color: white;
+  }
+
+  &--delete {
+    background: $danger-color;
+    color: white;
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+// BEM Block: monthly-dashboard (wrapper for monthly view)
+.monthly-dashboard {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: #FFF;
+  padding: 24px;
+  border-radius: 12px;
+}
+
+// BEM Block: empty-state (for no expenses)
+.empty-state {
+  text-align: center;
+  color: $text-muted;
+  padding: 40px 20px;
+}
+
+// Responsive modifiers (using BEM modifiers for media queries where applicable)
+@media (min-width: 600px) {
+  .expense-form {
+    flex-direction: row;
+    align-items: end;
+
+    .expense-form__input {
+      flex: 1;
+      margin-right: 10px;
 
       &:last-of-type {
-        background: $danger-color;
-        color: white;
+        margin-right: 0;
       }
+    }
 
-      &:hover {
-        opacity: 0.9;
-      }
+    .expense-form__button {
+      flex-shrink: 0;
+      white-space: nowrap;
     }
   }
 
-  @media (min-width: 600px) {
+  .expense-list__item {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
 
-    .details {
+    .expense-list__details {
       flex: 1;
       flex-direction: row;
     }
 
-    .actions {
+    .expense-list__actions {
       margin-top: 0;
     }
   }
 }
 
-// Responsive adjustments
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   body {
     padding: 10px;
   }
@@ -204,12 +344,55 @@ select {
     padding: 15px;
   }
 
-  .total {
+  .dashboard__total {
     font-size: 2em;
   }
 
-  .expense-item .details {
+  .month-selector {
     flex-direction: column;
-    align-items: flex-start;
+    gap: 10px;
+
+    .month-selector__select {
+      min-width: unset;
+      width: 100%;
+    }
+  }
+
+  .monthly-summary__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .expense-list__item {
+    flex-direction: column !important;
+    align-items: stretch !important;
+
+    .expense-list__details {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 10px !important;
+
+      .expense-list__date {
+        align-self: flex-start;
+      }
+
+      .expense-list__amount {
+        text-align: left !important;
+      }
+    }
+
+    .expense-list__actions {
+      justify-content: flex-end;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .expense-form {
+    flex-direction: column !important;
+
+    .expense-form__input {
+      margin-right: 0 !important;
+      margin-bottom: 10px;
+    }
   }
 }

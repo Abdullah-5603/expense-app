@@ -1,8 +1,10 @@
-import ClientDashboard from '@/components/ClientDashboard'
-import { getExpenses } from '@/lib/expenses'
+import MonthlyDashboard from '@/components/Monthly/MonthlyDashboard'
+import { getExpensesByMonth } from '@/lib/expenses'
+import { getCurrentMonthYear } from '@/utils/helper'
 
 export default async function ExpensesPage() {
-  // Server-side fetch for initial data (SSR)
-  const initialData = await getExpenses();
-  return <ClientDashboard initialData={initialData} />
+  const currentMonth = getCurrentMonthYear()
+  const initialData = await getExpensesByMonth(currentMonth)
+  
+  return <MonthlyDashboard initialData={initialData} initialMonth={currentMonth} />
 }

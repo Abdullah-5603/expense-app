@@ -77,8 +77,8 @@ export default function ClientDashboard({ initialData }) {
 
     return (
         <div className="dashboard">
-            <h1>Expenses Dashboard</h1>
-            <div className="total">Total Expenses: ${total.toFixed(2)}</div>
+            <h1 className='dashboard__title'>Expenses Dashboard</h1>
+            <div className="dashboard__total">Total Expenses: ${total.toFixed(2)}</div>
             <select value={filter} onChange={(e) => setFilter(e.target.value)}>
                 {categories.map((cat) => (
                     <option key={cat} value={cat}>

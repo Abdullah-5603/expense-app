@@ -8,11 +8,11 @@ export default function ExpenseList({ expenses, onEdit, onDelete }) {
   return (
     <ul className="expense-list">
       {expenses.map((exp) => (
-        <li key={exp._id} className="expense-item">
-          <div className="details">
-            <span>{exp.name}</span>
-            <span className="amount">${exp.amount.toFixed(2)}</span>
-            <span className="category">{exp.category}</span>
+        <li key={exp._id} className="expense-list__item">
+          <div className="expense-list__details">
+            <span className="expense-list__name">{exp.name}</span>
+            <span className="expense-list__amount">${exp.amount.toFixed(2)}</span>
+            <span className="expense-list__category">{exp.category}</span>
           </div>
           <div className="actions">
             <button onClick={() => onEdit(exp)}>Edit</button>
