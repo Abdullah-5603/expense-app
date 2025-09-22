@@ -1,6 +1,8 @@
 'use client'
 
-import { format, parseISO } from 'date-fns'
+import { format, parseISO } from 'date-fns';
+
+import './styles/monthlyExpenseList.scss'
 
 export default function MonthlyExpenseList({ expenses, onEdit, onDelete }) {
     if (expenses.length === 0) {

@@ -7,6 +7,8 @@ import ExpenseForm from '../ExpenseForm'
 import { getCurrentMonthYear } from '@/utils/helper'
 import MonthlySummary from './MonthlySummery'
 
+import './styles/monthlyDashboard.scss'
+
 export default function MonthlyDashboard({ initialData, initialMonth }) {
   
   const [selectedMonth, setSelectedMonth] = useState(initialMonth || getCurrentMonthYear())
