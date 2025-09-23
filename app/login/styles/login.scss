@@ -1,0 +1,15 @@
+.expense-login {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+
+   &__google-btn {
+      padding: 24px 12px;
+      background: var(--primary-color);
+      color: #FFFFFF;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+   }
+}

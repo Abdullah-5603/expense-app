@@ -1,10 +1,15 @@
-import MonthlyDashboard from '@/components/Monthly/MonthlyDashboard'
-import { getExpensesByMonth } from '@/lib/expenses'
-import { getCurrentMonthYear } from '@/utils/helper'
+import ExpensesClient from "@/components/ExpenseClient";
+import { getExpensesByMonth } from "@/lib/expenses";
+import { getCurrentMonthYear } from "@/utils/helper";
 
 export default async function ExpensesPage() {
-  const currentMonth = getCurrentMonthYear()
-  const initialData = await getExpensesByMonth(currentMonth)
-  
-  return <MonthlyDashboard initialData={initialData} initialMonth={currentMonth} />
+  const currentMonth = getCurrentMonthYear();
+  const initialData = await getExpensesByMonth(currentMonth);
+
+  return (
+    <ExpensesClient
+      initialData={initialData}
+      initialMonth={currentMonth}
+    />
+  );
 }
