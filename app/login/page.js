@@ -10,12 +10,21 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleGoogleLogin = async () => {
-    try {
-      await signInWithPopup(auth, provider);
-      router.push("/expenses");
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
+    await signInWithPopup(auth, provider)
+      .then(async (response) => {
+        return await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(response.user),
+        })
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        router.push("/expenses");
+      })
+      .catch(() => {
+        console.error("Login failed:", error);
+      })
   };
 
   return (

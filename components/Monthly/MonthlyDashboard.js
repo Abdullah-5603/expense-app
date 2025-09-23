@@ -9,8 +9,10 @@ import MonthlySummary from './MonthlySummery'
 
 import './styles/monthlyDashboard.scss'
 import Navbar from '../Navbar/Navbar'
+import { useAuth } from '@/context/AuthContext'
 
 export default function MonthlyDashboard({ initialData, initialMonth }) {
+  const {user} = useAuth();
   
   const [selectedMonth, setSelectedMonth] = useState(initialMonth || getCurrentMonthYear())
   const [expenses, setExpenses] = useState(initialData.expenses)
@@ -39,14 +41,15 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
     setSelectedMonth(month)
     setEditingId(null)
     setEditingExpense(null)
-  }
+  };
+  console.log({user});
 
   const handleAdd = async (data) => {
     try {
       const response = await fetch('/api/expenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, date: data.date || new Date().toISOString() }),
+        body: JSON.stringify({ ...data, date: data.date || new Date().toISOString(), email: user.email }),
       })
       
       if (response.ok) {

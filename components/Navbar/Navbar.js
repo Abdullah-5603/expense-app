@@ -1,17 +1,17 @@
 "use client"
 
 import React from 'react';
-import {  signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase/firebase';
 import { useRouter } from "next/navigation";
 
 import './styles.scss';
+import { useAuth } from '@/context/AuthContext';
 
 const Navbar = () => {
+    const {logout} = useAuth();
      const router = useRouter();
 
     const handleLogout = async ()=>{
-        await signOut(auth)
+        await logout()
         .then(()=> router.replace('/login'))
     }
 
