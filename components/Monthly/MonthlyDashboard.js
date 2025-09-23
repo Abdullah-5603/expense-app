@@ -42,7 +42,6 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
     setEditingId(null)
     setEditingExpense(null)
   };
-  console.log({user});
 
   const handleAdd = async (data) => {
     try {

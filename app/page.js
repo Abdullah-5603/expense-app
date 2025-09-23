@@ -1,28 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase/firebase";
+import { useAuth } from "@/context/AuthContext";
 
 export default function HomePage() {
-  const [loading, setLoading] = useState(true);
+  const {user, loading} = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        router.replace("/expenses");
-      } else {
-        router.replace("/login");
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [router]);
-
   if (loading) return <p>Loading...</p>;
+  if (user) return router.replace("/expenses");
 
-  return null;
+  return router.replace("/login");
 }

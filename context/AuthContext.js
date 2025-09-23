@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser || null);
+      setUser(currentUser ?? null);
       setLoading(false);
     });
 
@@ -34,5 +34,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// ✅ Hook for consuming context
 export const useAuth = () => useContext(AuthContext);
