@@ -1,10 +1,3 @@
-// import { redirect } from 'next/navigation'
-// export default function HomePage() {
-//   redirect('/expenses')
-// }
-
-
-
 "use client";
 
 import { useEffect, useState } from "react";

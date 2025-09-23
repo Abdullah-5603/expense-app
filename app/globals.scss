@@ -9,13 +9,17 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 
 :root {
   --primary-color: #007bff;
+  --secondary-color: #6c757d; /* neutral gray */
   --danger-color: #d9534f;
   --success-color: #5cb85c;
   --border-color: #ddd;
   --background-light: #f8f9fa;
+  --body-background: #f8f9fa;
+  --text-color: #212529; /* default dark text */
   --text-muted: #666;
   --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
 
 // Reset and base styles (not BEM, but foundational)
 * {

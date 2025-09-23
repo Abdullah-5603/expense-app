@@ -8,6 +8,7 @@ import { getCurrentMonthYear } from '@/utils/helper'
 import MonthlySummary from './MonthlySummery'
 
 import './styles/monthlyDashboard.scss'
+import Navbar from '../Navbar/Navbar'
 
 export default function MonthlyDashboard({ initialData, initialMonth }) {
   
@@ -116,6 +117,7 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
 
   return (
     <div className="monthly-dashboard">
+      <Navbar/> 
       <MonthSelector
         selectedMonth={selectedMonth}
         onMonthChange={handleMonthChange}
