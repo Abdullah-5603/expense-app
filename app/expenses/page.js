@@ -3,7 +3,6 @@
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import ExpensesClient from "@/components/ExpenseClient";
-import { getExpensesByMonth } from "@/lib/expenses";
 import { getCurrentMonthYear } from "@/utils/helper";
 
 export default function ExpensesPage() {
@@ -15,7 +14,9 @@ export default function ExpensesPage() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const data = await getExpensesByMonth(currentMonth, user.email);
+      const response = await fetch(`/api/expenses?month=${currentMonth}&email=${user.email}`);
+      if (!response.ok) return;
+      const data = await response.json();
       setInitialData(data);
     })();
   }, [user, currentMonth]);
