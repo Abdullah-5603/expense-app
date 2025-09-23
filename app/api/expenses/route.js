@@ -4,9 +4,10 @@ import { getExpensesByMonth, createExpense, getAvailableMonths } from '@/lib/exp
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url)
-    const month = searchParams.get('month')
+    const month = searchParams.get('month');
+    const email = searchParams.get('email');
     
-    const { expenses, total } = await getExpensesByMonth(month)
+    const { expenses, total } = await getExpensesByMonth(month, email)
     return NextResponse.json({ expenses, total })
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 400 })

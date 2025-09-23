@@ -22,7 +22,7 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
 
   const refreshData = async (month = selectedMonth) => {
     try {
-      const response = await fetch(`/api/expenses?month=${month}`)
+      const response = await fetch(`/api/expenses?month=${month}&email=${user.email}`)
       if (response.ok) {
         const { expenses: newExpenses, total: newTotal } = await response.json()
         setExpenses(newExpenses)
