@@ -1,24 +1,31 @@
 "use client";
 
-import { useEffect } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import MonthlyDashboard from "@/components/Monthly/MonthlyDashboard";
-import { auth } from "@/lib/firebase/firebase";
+import { useAuth } from "@/context/AuthContext";
+import { getCurrentMonthYear } from "@/utils/helper";
+
 
 export default function ExpensesClient(props) {
-  const router = useRouter();
+ const { user } = useAuth();
+  const [initialData, setInitialData] = useState(null);
+
+  const currentMonth = getCurrentMonthYear();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        router.replace("/login");
-      }
-    });
-    return () => unsubscribe();
-  }, [router]);
+    if (!user) return;
+    (async () => {
+      const response = await fetch(`/api/expenses?month=${currentMonth}&email=${user.email}`);
+      if (!response.ok) return;
+      const data = await response.json();
+      setInitialData(data);
+    })();
+  }, [user, currentMonth]);
+
+  if (!user) return <p>Loading...</p>;
+  if (!initialData) return <h1>Fetching expenses...</h1>;
 
   return (
-    <MonthlyDashboard {...props} />
+    <MonthlyDashboard initialData={initialData} initialMonth={currentMonth} />
   );
 }
