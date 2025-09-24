@@ -6,23 +6,24 @@ import MonthlyExpenseList from './MonthlyExpenseList'
 import ExpenseForm from '../ExpenseForm'
 import { getCurrentMonthYear } from '@/utils/helper'
 import MonthlySummary from './MonthlySummery'
-
-import './styles/monthlyDashboard.scss'
 import Navbar from '../Navbar/Navbar'
 import { useAuth } from '@/context/AuthContext'
+
+import './styles/monthlyDashboard.scss'
 
 export default function MonthlyDashboard({ initialData, initialMonth }) {
   const {user} = useAuth();
   
   const [selectedMonth, setSelectedMonth] = useState(initialMonth || getCurrentMonthYear())
+  const [selectedCategory, setSelectedCategory] = useState('All')
   const [expenses, setExpenses] = useState(initialData.expenses)
   const [total, setTotal] = useState(initialData.total)
   const [editingId, setEditingId] = useState(null)
   const [editingExpense, setEditingExpense] = useState(null)
 
-  const refreshData = async (month = selectedMonth) => {
+  const refreshData = async (month = selectedMonth, category = selectedCategory) => {
     try {
-      const response = await fetch(`/api/expenses?month=${month}&email=${user.email}`)
+      const response = await fetch(`/api/expenses?month=${month}&email=${user.email}&category=${category}`)
       if (response.ok) {
         const { expenses: newExpenses, total: newTotal } = await response.json()
         setExpenses(newExpenses)
@@ -35,7 +36,7 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
 
   useEffect(() => {
     refreshData()
-  }, [selectedMonth])
+  }, [selectedMonth, selectedCategory])
 
   const handleMonthChange = (month) => {
     setSelectedMonth(month)
@@ -129,6 +130,9 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
         monthYear={selectedMonth}
         total={total}
         expenseCount={expenses.length}
+        selectedCategory={selectedCategory}
+        categories={initialData.expenses.map((expense) => expense.category).filter((category, index, categories) => categories.indexOf(category) === index)}
+        setSelectedCategory={setSelectedCategory}
       />
       
       <ExpenseForm

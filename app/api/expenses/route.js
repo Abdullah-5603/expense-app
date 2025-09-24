@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server'
-import { getExpensesByMonth, createExpense, getAvailableMonths } from '@/lib/expenses'
+import { getExpensesByMonth, createExpense } from '@/lib/expenses'
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url)
     const month = searchParams.get('month');
     const email = searchParams.get('email');
+    const category = searchParams.get('category');
     
-    const { expenses, total } = await getExpensesByMonth(month, email)
+    const { expenses, total } = await getExpensesByMonth(month, email, category);
     return NextResponse.json({ expenses, total })
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 400 })
