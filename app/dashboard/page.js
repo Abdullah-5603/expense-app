@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import AppLayout from '@/components/Layout/AppLayout'
+import SummarySection from '@/components/Dashboard/SummarySection'
 import ExpenseList from '@/components/Expenses/ExpenseList'
 import ExpenseForm from '@/components/Expenses/ExpenseForm'
 import Modal from '@/components/UI/Modal'
@@ -10,12 +11,11 @@ import { EmptyState, LoadingSkeleton } from '@/components/UI/States'
 import { useAuth } from '@/context/AuthContext'
 import { getCurrentMonthYear } from '@/utils/helper'
 
-export default function ExpensesPage() {
+export default function DashboardPage() {
   const { user, logout } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [expenses, setExpenses] = useState([])
-  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthYear())
-  const [selectedCategory, setSelectedCategory] = useState('All')
+  const [total, setTotal] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
@@ -23,21 +23,24 @@ export default function ExpensesPage() {
   const [deletingId, setDeletingId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
 
+  const currentMonth = getCurrentMonthYear()
+
   useEffect(() => {
     if (user?.email) {
       fetchExpenses()
     }
-  }, [user?.email, selectedMonth, selectedCategory])
+  }, [user?.email])
 
   const fetchExpenses = async () => {
     if (!user?.email) return
     
     setIsLoading(true)
     try {
-      const response = await fetch(`/api/expenses?month=${selectedMonth}&email=${user.email}&category=${selectedCategory === 'All' ? '' : selectedCategory}`)
+      const response = await fetch(`/api/expenses?month=${currentMonth}&email=${user.email}`)
       if (response.ok) {
-        const { expenses: data, total } = await response.json()
+        const { expenses: data, total: totalAmount } = await response.json()
         setExpenses(data || [])
+        setTotal(totalAmount || 0)
       }
     } catch (error) {
       console.error('Error fetching expenses:', error)
@@ -45,6 +48,20 @@ export default function ExpensesPage() {
       setIsLoading(false)
     }
   }
+
+  // Get unique categories
+  const categories = [...new Set(expenses.map(e => e.category))]
+
+  // Calculate category breakdown
+  const categoryBreakdown = categories.map(cat => ({
+    name: cat,
+    amount: expenses
+      .filter(e => e.category === cat)
+      .reduce((sum, e) => sum + e.amount, 0),
+    count: expenses.filter(e => e.category === cat).length
+  })).sort((a, b) => b.amount - a.amount)
+
+  const topCategory = categoryBreakdown[0] || null
 
   const handleAddExpenseClick = () => {
     setEditingId(null)
@@ -63,11 +80,9 @@ export default function ExpensesPage() {
       })
       
       if (response.ok) {
-        const { expenses: newExpenses, total, monthYear } = await response.json()
+        const { expenses: newExpenses, total: newTotal } = await response.json()
         setExpenses(newExpenses || [])
-        if (monthYear !== selectedMonth) {
-          setSelectedMonth(monthYear)
-        }
+        setTotal(newTotal || 0)
         setIsModalOpen(false)
       }
     } catch (error) {
@@ -93,14 +108,12 @@ export default function ExpensesPage() {
       })
       
       if (response.ok) {
-        const { expenses: newExpenses, total, monthYear } = await response.json()
+        const { expenses: newExpenses, total: newTotal } = await response.json()
         setExpenses(newExpenses || [])
+        setTotal(newTotal || 0)
         setEditingId(null)
         setEditingExpense(null)
         setIsModalOpen(false)
-        if (monthYear !== selectedMonth) {
-          setSelectedMonth(monthYear)
-        }
       }
     } catch (error) {
       console.error('Error updating expense:', error)
@@ -121,8 +134,9 @@ export default function ExpensesPage() {
       })
       
       if (response.ok) {
-        const { expenses: newExpenses, total } = await response.json()
+        const { expenses: newExpenses, total: newTotal } = await response.json()
         setExpenses(newExpenses || [])
+        setTotal(newTotal || 0)
       }
     } catch (error) {
       console.error('Error deleting expense:', error)
@@ -146,11 +160,7 @@ export default function ExpensesPage() {
     }
   }
 
-  // Get unique categories
-  const categories = [...new Set(expenses.map(e => e.category))]
-  const allCategories = ['All', ...categories]
-
-  // Filter by search
+  // Filter expenses by search query
   const filteredExpenses = searchQuery
     ? expenses.filter(e => 
         e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -160,70 +170,41 @@ export default function ExpensesPage() {
 
   return (
     <AppLayout
-      title={`Expenses - ${selectedMonth}`}
+      title="Dashboard"
       user={user}
       onAddExpense={handleAddExpenseClick}
       onLogout={handleLogout}
       showAddButton={true}
     >
-      {/* Month Filter */}
-      <div style={{ marginBottom: '24px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-        <select
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-          style={{
-            padding: '8px 12px',
-            border: '1px solid var(--secondary-color)',
-            borderRadius: '8px',
-            background: 'white',
-            fontSize: '0.875rem'
-          }}
-        >
-          <option value="January 2026">January 2026</option>
-          <option value="December 2025">December 2025</option>
-          <option value="November 2025">November 2025</option>
-          <option value="October 2025">October 2025</option>
-        </select>
+      {/* Summary Section with KPI Cards */}
+      <SummarySection
+        totalExpenses={total}
+        expenseCount={expenses.length}
+        averageExpense={expenses.length > 0 ? total / expenses.length : 0}
+        topCategory={topCategory}
+        categories={categoryBreakdown}
+        isLoading={isLoading}
+      />
 
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          style={{
-            padding: '8px 12px',
-            border: '1px solid var(--secondary-color)',
-            borderRadius: '8px',
-            background: 'white',
-            fontSize: '0.875rem'
-          }}
-        >
-          {allCategories.map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Expense List */}
+      {/* Recent Expenses List */}
       {isLoading ? (
-        <LoadingSkeleton type="list" count={8} />
+        <LoadingSkeleton type="cards" count={3} />
       ) : expenses.length === 0 ? (
         <EmptyState
-          title="No expenses found"
-          description={selectedMonth !== getCurrentMonthYear() 
-            ? `No expenses found for ${selectedMonth}. Try selecting a different month.`
-            : "You haven't added any expenses this month."
-          }
+          title="No expenses yet"
+          description="Start tracking your expenses by adding your first one."
           actionLabel="Add Expense"
           onAction={handleAddExpenseClick}
         />
       ) : (
         <ExpenseList
-          expenses={filteredExpenses}
+          expenses={filteredExpenses.slice(0, 5)} // Show only recent 5
           onEdit={handleEdit}
           onDelete={handleDeleteClick}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          categoryFilter={selectedCategory}
-          onCategoryChange={setSelectedCategory}
+          categoryFilter="All"
+          onCategoryChange={() => {}}
           categories={categories}
         />
       )}

@@ -1,0 +1,197 @@
+// KPI Cards Component
+// ====================
+// Summary cards showing key metrics with trend indicators
+
+@import '../layout/variables';
+
+// BEM Block: kpi-grid
+.kpi-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-xl;
+
+  @include mobile {
+    gap: $spacing-md;
+  }
+}
+
+// BEM Block: kpi-card
+.kpi-card {
+  flex: 1;
+  min-width: 200px;
+  background: white;
+  border: 1px solid var(--secondary-color);
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  position: relative;
+  overflow: hidden;
+  transition: transform $transition-fast, box-shadow $transition-fast;
+
+  // Subtle hover lift
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  // Colored accent bar at top
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--primary-color);
+  }
+
+  // Variants
+  &--success::before {
+    background: var(--primary-color);
+  }
+
+  &--warning::before {
+    background: #f59e0b;
+  }
+
+  &--danger::before {
+    background: var(--btn-color);
+  }
+
+  &--neutral::before {
+    background: var(--secondary-text);
+  }
+
+  // Header row
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-sm;
+  }
+
+  // Icon wrapper
+  &__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    &--primary {
+      background: rgba(8, 177, 110, 0.1);
+      color: var(--primary-color);
+    }
+
+    &--danger {
+      background: rgba(221, 55, 55, 0.1);
+      color: var(--btn-color);
+    }
+
+    &--warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+    }
+
+    &--neutral {
+      background: var(--gray-color);
+      color: var(--secondary-text);
+    }
+  }
+
+  // Trend indicator
+  &__trend {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-full;
+
+    svg {
+      width: 12px;
+      height: 12px;
+      fill: currentColor;
+    }
+
+    &--up {
+      background: rgba(221, 55, 55, 0.1);
+      color: var(--btn-color);
+    }
+
+    &--down {
+      background: rgba(8, 177, 110, 0.1);
+      color: var(--primary-color);
+    }
+
+    &--neutral {
+      background: var(--gray-color);
+      color: var(--secondary-text);
+    }
+  }
+
+  // Label
+  &__label {
+    font-size: 0.875rem;
+    color: var(--secondary-text);
+    font-weight: 500;
+    margin: 0;
+  }
+
+  // Value
+  &__value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-text);
+    line-height: 1.2;
+    margin: 0;
+
+    @include mobile {
+      font-size: 1.5rem;
+    }
+  }
+
+  // Subtitle
+  &__subtitle {
+    font-size: 0.75rem;
+    color: var(--secondary-text);
+    margin: 0;
+  }
+
+  // Spacer for flexible layouts
+  &--spacer {
+    flex-grow: 1;
+  }
+}
+
+// Mini KPI variant (smaller cards for inline display)
+.kpi-card--mini {
+  min-width: 140px;
+  padding: $spacing-lg;
+
+  .kpi-card__value {
+    font-size: 1.25rem;
+  }
+
+  .kpi-card__icon {
+    width: 32px;
+    height: 32px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}

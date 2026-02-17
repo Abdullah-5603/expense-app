@@ -2,7 +2,7 @@
     display: flex;
     justify-content: space-between;
     padding: 16px;
-    background: var(--body-background);
+    background: var(--gray-color);
     border-radius: 4px;
 
     &__logo{
@@ -18,7 +18,7 @@
         cursor: pointer;
         font-size: 0.9em;
         transition: opacity 0.2s;
-        background: var(--danger-color);
+        background: var(--btn-color);
         color: #FFF;
     }
 }

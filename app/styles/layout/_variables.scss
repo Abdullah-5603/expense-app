@@ -1,0 +1,90 @@
+// Layout Variables & Breakpoints
+// ==============================
+
+// Breakpoints (following the design spec)
+$breakpoint-tablet: 768px;
+$breakpoint-mobile: 480px;
+$breakpoint-desktop: 1024px;
+
+// Layout dimensions
+$sidebar-width: 260px;
+$sidebar-collapsed-width: 72px;
+$header-height: 72px;
+$content-max-width: 1200px;
+
+// Spacing scale (based on 4px grid)
+$spacing-unit: 4px;
+$spacing-xs: $spacing-unit;      // 4px
+$spacing-sm: $spacing-unit * 2;  // 8px
+$spacing-md: $spacing-unit * 3;  // 12px
+$spacing-lg: $spacing-unit * 4; // 16px
+$spacing-xl: $spacing-unit * 6;  // 24px
+$spacing-2xl: $spacing-unit * 8; // 32px
+$spacing-3xl: $spacing-unit * 12;// 48px
+
+// Border radius
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+$radius-full: 9999px;
+
+// Transitions
+$transition-fast: 120ms ease;
+$transition-normal: 200ms ease;
+$transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+// Z-index layers
+$z-sidebar: 100;
+$z-header: 90;
+$z-modal-backdrop: 200;
+$z-modal: 300;
+$z-tooltip: 400;
+
+// Mixins
+@mixin tablet {
+  @media (max-width: #{$breakpoint-tablet}) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media (max-width: #{$breakpoint-mobile}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$breakpoint-desktop}) {
+    @content;
+  }
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin card-hover {
+  transition: transform $transition-fast, box-shadow $transition-fast;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+}
+
+@mixin button-press {
+  transition: transform $transition-fast;
+  
+  &:active {
+    transform: scale(0.97);
+  }
+}

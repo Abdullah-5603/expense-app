@@ -9,10 +9,10 @@
         flex-direction: column;
         gap: 5px;
         padding: 15px;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--secondary-color);
         border-radius: 4px;
         margin-bottom: 10px;
-        background: #fafafa;
+        background: var(--gray-color);
     }
 
     &__details {
@@ -27,8 +27,8 @@
         min-width: 60px;
         text-align: center;
         font-weight: bold;
-        color: var(--text-muted);
-        background: #f0f0f0;
+        color: var(--secondary-text);
+        background: var(--gray-color);
         padding: 5px;
         border-radius: 4px;
     }
@@ -46,7 +46,7 @@
 
     &__category {
         font-size: 0.9em;
-        color: var(--text-muted);
+        color: var(--secondary-text);
         background: var(--primary-color);
         color: white;
         padding: 4px 8px;
@@ -54,7 +54,7 @@
     }
 
     &__amount {
-        color: var(--danger-color);
+        color: var(--btn-color);
         font-weight: bold;
         min-width: 80px;
         text-align: right;
@@ -76,12 +76,12 @@
         transition: opacity 0.2s;
 
         &--edit {
-            background: var(--success-color);
+            background: var(--primary-color);
             color: white;
         }
 
         &--delete {
-            background: var(--danger-color);
+            background: var(--btn-color);
             color: white;
         }
 

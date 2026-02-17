@@ -1,29 +1,22 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import { AuthProvider } from "@/context/AuthContext";
 import './globals.scss'
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: 'swap',
 });
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 
 export const metadata = {
-  title: 'Personal Expenses App',
-  description: 'Manage your expenses with ease',
+  title: 'ExpenseTrack - Personal Expense Manager',
+  description: 'Track and manage your expenses with ease',
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${inter.variable} antialiased`}>
         <AuthProvider>
           {children}
         </AuthProvider>
@@ -31,4 +24,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-

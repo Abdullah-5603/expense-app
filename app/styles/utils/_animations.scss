@@ -1,0 +1,270 @@
+// Animations (Pure SCSS)
+// ======================
+// Subtle, premium animations using only CSS transitions and keyframes
+
+@import '../layout/variables';
+
+// ============================================
+// Entry / Page Load Animations
+// ============================================
+
+// Fade in up (for cards, modals)
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Fade in (for overlays, backgrounds)
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Scale in (for modals, dropdowns)
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Slide in from right (for sidebar on mobile)
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+// Staggered children animation (for lists)
+.animate-stagger > * {
+  animation: fadeInUp 0.4s ease backwards;
+  
+  @for $i from 1 through 10 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.05}s;
+    }
+  }
+}
+
+// ============================================
+// Hover Animations
+// ============================================
+
+// Card hover lift
+.animate-lift {
+  transition: transform $transition-fast, box-shadow $transition-fast;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+}
+
+// Button hover scale
+.animate-scale {
+  transition: transform $transition-fast, box-shadow $transition-fast;
+  
+  &:hover {
+    transform: scale(1.02);
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// Icon rotate (for arrows, toggles)
+.animate-rotate {
+  transition: transform $transition-normal;
+}
+
+.animate-rotate--180 {
+  transform: rotate(180deg);
+}
+
+// ============================================
+// Micro-interactions
+// ============================================
+
+// Pulse (for notifications, badges)
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+// Bounce (for loading states)
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 0.6s ease-in-out;
+}
+
+// Skeleton shimmer (for loading states)
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--secondary-color) 25%,
+    #e5e7eb 50%,
+    var(--secondary-color) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+// ============================================
+// Focus States
+// ============================================
+
+// Focus ring (for accessibility)
+.animate-focus {
+  transition: box-shadow $transition-fast;
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(8, 177, 110, 0.3);
+  }
+}
+
+// ============================================
+// Sidebar Animations
+// ============================================
+
+// Sidebar collapse/expand
+.sidebar-animate {
+  transition: width $transition-smooth;
+  
+  &__icon {
+    transition: transform $transition-normal;
+  }
+  
+  &--collapsed {
+    .sidebar-animate__icon {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+// ============================================
+// Modal Animations
+// ============================================
+
+// Modal backdrop
+.modal-backdrop-animate {
+  transition: opacity $transition-normal;
+}
+
+// Modal content
+.modal-content-animate {
+  transition: transform $transition-smooth, opacity $transition-smooth;
+}
+
+// ============================================
+// Tab Switching
+// ============================================
+
+// Tab indicator slide
+@keyframes tabSlide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.animate-tab-slide {
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary-color);
+    transform: scaleX(0);
+    transition: transform $transition-normal;
+  }
+  
+  &--active::after {
+    transform: scaleX(1);
+  }
+}
+
+// ============================================
+// Utility Classes
+// ============================================
+
+// Duration modifiers
+.transition-fast {
+  transition-duration: $transition-fast;
+}
+
+.transition-normal {
+  transition-duration: $transition-normal;
+}
+
+.transition-smooth {
+  transition-duration: $transition-smooth;
+}
+
+// Disable animations for reduced motion
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+  
+  .animate-stagger > * {
+    animation: none;
+  }
+  
+  .animate-shimmer {
+    animation: none;
+  }
+}
