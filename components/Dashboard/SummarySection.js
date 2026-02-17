@@ -1,28 +1,60 @@
 'use client'
 
-import KpiCard, { KpiGrid } from './KpiCard'
 import { CategoryBreakdown, ChartPlaceholder } from './Charts'
+import KpiCard, { KpiGrid } from './KpiCard'
 
-// SummarySection Component
+// SummarySection Component with Dynamic Data
 // BEM: Uses .kpi-grid, .kpi-card, .charts-section, .category-breakdown
-export default function SummarySection({ 
+export default function SummarySection({
   totalExpenses = 0,
   expenseCount = 0,
   averageExpense = 0,
   topCategory = null,
   categories = [],
+  monthlyData = [],
   isLoading = false
 }) {
   if (isLoading) {
     return (
-      <div className="kpi-grid">
-        {[1, 2, 3, 4].map(i => (
-          <div key={i} className="kpi-card">
-            <div style={{ height: '16px', width: '40%', background: 'var(--gray-color)', borderRadius: '4px' }}></div>
-            <div style={{ height: '32px', width: '60%', background: 'var(--gray-color)', borderRadius: '4px', marginTop: '8px' }}></div>
+      <>
+        {/* KPI Cards Skeleton */}
+        <div className="kpi-grid">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="kpi-card">
+              <div style={{ height: '16px', width: '40%', background: 'var(--gray-color)', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></div>
+              <div style={{ height: '32px', width: '60%', background: 'var(--gray-color)', borderRadius: '4px', marginTop: '8px', animation: 'pulse 1.5s ease-in-out infinite' }}></div>
+            </div>
+          ))}
+        </div>
+
+        {/* Charts Skeleton */}
+        <div className="chart-grid">
+          <div className="chart-card">
+            <div className="chart-card__content" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', height: '160px', padding: '16px 0' }}>
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} style={{
+                  width: '24px',
+                  height: '40%',
+                  background: 'var(--gray-color)',
+                  borderRadius: '4px 4px 0 0',
+                  animation: 'pulse 1.5s ease-in-out infinite'
+                }} />
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
+          <div className="chart-card">
+            <div className="chart-card__content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{
+                width: '120px',
+                height: '120px',
+                borderRadius: '50%',
+                background: 'var(--gray-color)',
+                animation: 'pulse 1.5s ease-in-out infinite'
+              }} />
+            </div>
+          </div>
+        </div>
+      </>
     )
   }
 
@@ -32,40 +64,40 @@ export default function SummarySection({
       <KpiGrid>
         <KpiCard
           label="Total Expenses"
-          value={`$${totalExpenses.toFixed(2)}`}
-          subtitle="This month"
+          value={`${totalExpenses.toFixed(2)}`}
+          subtitle="All time"
           icon="wallet"
           variant="danger"
-          trend="up"
-          trendValue="+12%"
         />
         <KpiCard
           label="Number of Expenses"
           value={expenseCount.toString()}
-          subtitle="Transactions"
+          subtitle="All time"
           icon="receipt"
           variant="neutral"
         />
         <KpiCard
           label="Average Expense"
-          value={`$${averageExpense.toFixed(2)}`}
-          subtitle="Per transaction"
+          value={`${averageExpense.toFixed(2)}`}
+          subtitle="All time"
           icon="trendUp"
           variant="warning"
         />
         <KpiCard
           label="Top Category"
           value={topCategory?.name || 'N/A'}
-          subtitle={topCategory ? `$${topCategory.amount.toFixed(2)}` : 'No data'}
+          subtitle={topCategory ? `${topCategory.amount?.toFixed(2)}` : 'No data'}
           icon="category"
           variant="success"
         />
       </KpiGrid>
 
-      {/* Charts Section */}
-      <ChartPlaceholder 
+      {/* Charts Section with Dynamic Data */}
+      <ChartPlaceholder
         title="Spending Overview"
-        subtitle="Monthly breakdown"
+        monthlyData={monthlyData}
+        categoryData={categories}
+        isLoading={isLoading}
       />
 
       {/* Category Breakdown */}

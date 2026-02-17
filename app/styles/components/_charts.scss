@@ -1,6 +1,6 @@
 // Charts & Category Breakdown
 // ============================
-// Chart placeholders and category visualization
+// Chart placeholders and category visualization 
 
 @import '../layout/variables';
 
@@ -26,37 +26,6 @@
     color: var(--primary-text);
     margin: 0;
   }
-
-  // Tab navigation for chart types
-  &__tabs {
-    display: flex;
-    gap: $spacing-xs;
-    background: var(--gray-color);
-    padding: $spacing-xs;
-    border-radius: $radius-md;
-  }
-
-  &__tab {
-    padding: $spacing-sm $spacing-md;
-    border: none;
-    border-radius: $radius-sm;
-    background: transparent;
-    color: var(--secondary-text);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all $transition-fast;
-
-    &:hover {
-      color: var(--primary-text);
-    }
-
-    &--active {
-      background: white;
-      color: var(--primary-text);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-  }
 }
 
 // Chart grid (2-column layout)
@@ -66,11 +35,24 @@
   gap: $spacing-lg;
 
   @include tablet {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   @include mobile {
     grid-template-columns: 1fr;
+  }
+
+  // 4-column variant for dashboard
+  &--2-cols {
+    grid-template-columns: repeat(2, 1fr);
+
+    @include tablet {
+      grid-template-columns: repeat(1, 1fr);
+    }
+
+    @include mobile {
+      grid-template-columns: 1fr;
+    }
   }
 }
 
@@ -114,6 +96,7 @@
     align-items: center;
     gap: $spacing-md;
     flex-wrap: wrap;
+    justify-content: center;
   }
 
   &__legend-item {
@@ -150,133 +133,15 @@
     width: 100%;
     height: 100%;
     min-height: 180px;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 19px,
-      var(--gray-color) 19px,
-      var(--gray-color) 20px
-    );
-    border-radius: $radius-sm;
-    position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 20%;
-      right: 20%;
-      top: 60%;
-      height: 60%;
-      background: linear-gradient(
-        to top,
-        rgba(8, 177, 110, 0.2),
-        rgba(8, 177, 110, 0.05)
-      );
-      border-radius: $radius-sm $radius-sm 0 0;
-    }
   }
 
   &__placeholder-text {
     font-size: 0.75rem;
     color: var(--secondary-text);
-    z-index: 1;
-  }
-}
-
-// Bar chart placeholder
-.bar-chart {
-  width: 100%;
-  height: 100%;
-  min-height: 160px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-around;
-  gap: $spacing-sm;
-  padding: $spacing-md 0;
-
-  &__bar {
-    flex: 1;
-    max-width: 40px;
-    background: linear-gradient(
-      to top,
-      var(--primary-color),
-      rgba(8, 177, 110, 0.6)
-    );
-    border-radius: $radius-sm $radius-sm 0 0;
-    position: relative;
-    transition: transform $transition-fast;
-
-    &:hover {
-      transform: scaleY(1.02);
-    }
-
-    &::after {
-      content: attr(data-label);
-      position: absolute;
-      bottom: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.625rem;
-      color: var(--secondary-text);
-      white-space: nowrap;
-    }
   }
 
-  &__value {
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.6875rem;
-    font-weight: 600;
-    color: var(--primary-text);
-  }
-}
-
-// Donut chart placeholder
-.donut-chart {
-  width: 160px;
-  height: 160px;
-  border-radius: $radius-full;
-  background: conic-gradient(
-    var(--primary-color) 0% 45%,
-    #f59e0b 45% 70%,
-    var(--btn-color) 70% 85%,
-    var(--secondary-color) 85% 100%
-  );
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80px;
-    height: 80px;
-    background: white;
-    border-radius: $radius-full;
-  }
-
-  &__center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    z-index: 1;
-  }
-
-  &__value {
-    display: block;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--primary-text);
-  }
-
-  &__label {
-    display: block;
-    font-size: 0.6875rem;
+  &__loading {
+    font-size: 0.875rem;
     color: var(--secondary-text);
   }
 }
@@ -375,25 +240,24 @@
 
   &__percentage {
     font-size: 0.75rem;
+    font-weight: 500;
     color: var(--secondary-text);
-    min-width: 40px;
+    min-width: 36px;
     text-align: right;
   }
 
-  // Progress bar
   &__bar {
     width: 100%;
     height: 4px;
     background: var(--gray-color);
-    border-radius: $radius-full;
-    margin-top: $spacing-sm;
+    border-radius: 2px;
     overflow: hidden;
+  }
 
-    &-fill {
-      height: 100%;
-      background: var(--primary-color);
-      border-radius: $radius-full;
-      transition: width $transition-smooth;
-    }
+  &__bar-fill {
+    height: 100%;
+    background: var(--primary-color);
+    border-radius: 2px;
+    transition: width $transition-normal;
   }
 }

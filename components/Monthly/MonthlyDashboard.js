@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import AppLayout from '@/components/Layout/AppLayout'
 import SummarySection from '@/components/Dashboard/SummarySection'
 import ExpenseList from '@/components/Expenses/ExpenseList'
@@ -25,44 +25,97 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
   const [editingExpense, setEditingExpense] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [monthlyData, setMonthlyData] = useState([])
+  
+  // All-time stats from API
+  const [allTimeStats, setAllTimeStats] = useState({
+    totalSpending: 0,
+    expenseCount: 0,
+    averageExpense: 0
+  })
 
-  // Get unique categories from expenses
+  // Calculate category breakdown
   const categories = [...new Set(expenses.map(e => e.category))]
-
-  // Calculate category breakdown for summary
   const categoryBreakdown = categories.map(cat => ({
     name: cat,
     amount: expenses
       .filter(e => e.category === cat)
       .reduce((sum, e) => sum + e.amount, 0),
-    count: expenses.filter(e => e.category === cat).length
+    count: expenses.filter(e => e.category === cat).length,
+    percentage: total > 0 ? (expenses.filter(e => e.category === cat).reduce((sum, e) => sum + e.amount, 0) / total * 100).toFixed(0) : 0
   })).sort((a, b) => b.amount - a.amount)
 
   const topCategory = categoryBreakdown[0] || null
 
-  const refreshData = async (month = selectedMonth, category = selectedCategory) => {
+  // Fetch expenses from API
+  const fetchExpenses = useCallback(async (month = selectedMonth, category = selectedCategory) => {
     if (!user?.email) return
     
     setIsLoading(true)
     try {
-      const response = await fetch(`/api/expenses?month=${month}&email=${user.email}&category=${category}`)
+      const params = new URLSearchParams()
+      params.append('month', month)
+      params.append('email', user.email)
+      
+      // Only add category filter if not "All"
+      if (category && category !== 'All') {
+        params.append('category', category)
+      }
+      
+      const response = await fetch(`/api/expenses?${params.toString()}`)
       if (response.ok) {
-        const { expenses: newExpenses, total: newTotal } = await response.json()
-        setExpenses(newExpenses || [])
-        setTotal(newTotal || 0)
+        const data = await response.json()
+        setExpenses(data.expenses || [])
+        setTotal(data.total || 0)
+      } else {
+        setExpenses([])
+        setTotal(0)
       }
     } catch (error) {
       console.error('Error refreshing data:', error)
+      setExpenses([])
+      setTotal(0)
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [user?.email, selectedMonth, selectedCategory])
 
+  // Initial load and when month/category changes
   useEffect(() => {
     if (user?.email) {
-      refreshData()
+      fetchExpenses(selectedMonth, selectedCategory)
     }
-  }, [selectedMonth, selectedCategory, user?.email])
+  }, [user?.email, selectedMonth, selectedCategory])
+
+  // Fetch monthly spending data for charts
+  const fetchMonthlyData = useCallback(async () => {
+    if (!user?.email) return
+    
+    try {
+      const params = new URLSearchParams()
+      params.append('email', user.email)
+      
+      const response = await fetch(`/api/expenses/spending?${params.toString()}`)
+      if (response.ok) {
+        const data = await response.json()
+        setMonthlyData(data.monthlyData || [])
+        setAllTimeStats({
+          totalSpending: data.totalSpending || 0,
+          expenseCount: data.expenseCount || 0,
+          averageExpense: data.averageExpense || 0
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching monthly data:', error)
+    }
+  }, [user?.email])
+
+  // Fetch monthly data on mount
+  useEffect(() => {
+    if (user?.email) {
+      fetchMonthlyData()
+    }
+  }, [user?.email, fetchMonthlyData])
 
   const handleMonthChange = (month) => {
     setSelectedMonth(month)
@@ -87,13 +140,16 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
       })
       
       if (response.ok) {
-        const { expenses: newExpenses, total: newTotal, monthYear } = await response.json()
-        setExpenses(newExpenses || [])
-        setTotal(newTotal || 0)
-        setIsModalOpen(false)
-        if (monthYear !== selectedMonth) {
-          setSelectedMonth(monthYear)
+        const result = await response.json()
+        setExpenses(result.expenses || [])
+        setTotal(result.total || 0)
+        fetchMonthlyData()
+        
+        if (result.monthYear !== selectedMonth) {
+          setSelectedMonth(result.monthYear)
         }
+        
+        setIsModalOpen(false)
       }
     } catch (error) {
       console.error('Error adding expense:', error)
@@ -109,15 +165,16 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
       })
       
       if (response.ok) {
-        const { expenses: newExpenses, total: newTotal, monthYear } = await response.json()
-        setExpenses(newExpenses || [])
-        setTotal(newTotal || 0)
+        const result = await response.json()
+        setExpenses(result.expenses || [])
+        setTotal(result.total || 0)
+        fetchMonthlyData()
         setEditingId(null)
         setEditingExpense(null)
         setIsModalOpen(false)
         
-        if (monthYear !== selectedMonth) {
-          setSelectedMonth(monthYear)
+        if (result.monthYear !== selectedMonth) {
+          setSelectedMonth(result.monthYear)
         }
       }
     } catch (error) {
@@ -148,9 +205,10 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
       })
       
       if (response.ok) {
-        const { expenses: newExpenses, total: newTotal } = await response.json()
-        setExpenses(newExpenses || [])
-        setTotal(newTotal || 0)
+        const result = await response.json()
+        setExpenses(result.expenses || [])
+        setTotal(result.total || 0)
+        fetchMonthlyData()
       }
     } catch (error) {
       console.error('Error deleting expense:', error)
@@ -174,7 +232,13 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
     }
   }
 
-  // Filter expenses by search query
+  // Get expense name for delete modal
+  const getDeletingExpenseName = () => {
+    const expense = expenses.find(e => e._id === deletingId)
+    return expense?.name || 'this expense'
+  }
+
+  // Filter by search
   const filteredExpenses = searchQuery
     ? expenses.filter(e => 
         e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -182,25 +246,22 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
       )
     : expenses
 
-  // Get unique categories for filter
-  const allCategories = ['All', ...categories]
-
-  const modalFooter = null
-
   return (
     <AppLayout
       title={`${selectedMonth} Expenses`}
       user={user}
       onAddExpense={handleAddExpenseClick}
       onLogout={handleLogout}
+      showAddButton={true}
     >
       {/* Summary Section with KPI Cards */}
       <SummarySection
-        totalExpenses={total}
-        expenseCount={expenses.length}
-        averageExpense={expenses.length > 0 ? total / expenses.length : 0}
+        totalExpenses={allTimeStats.totalSpending}
+        expenseCount={allTimeStats.expenseCount}
+        averageExpense={allTimeStats.averageExpense}
         topCategory={topCategory}
         categories={categoryBreakdown}
+        monthlyData={monthlyData}
         isLoading={isLoading}
       />
 
@@ -232,7 +293,6 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
         isOpen={isModalOpen}
         onClose={handleCancel}
         title={editingId ? 'Edit Expense' : 'Add New Expense'}
-        footer={modalFooter}
       >
         <ExpenseForm
           onSubmit={editingId ? (data) => handleUpdate(editingId, data) : handleAdd}
@@ -251,7 +311,7 @@ export default function MonthlyDashboard({ initialData, initialMonth }) {
           setDeletingId(null)
         }}
         onConfirm={handleDelete}
-        itemName={expenses.find(e => e._id === deletingId)?.name}
+        itemName={getDeletingExpenseName()}
       />
     </AppLayout>
   )

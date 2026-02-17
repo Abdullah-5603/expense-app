@@ -1,5 +1,38 @@
 'use client'
 
+import { 
+  LineChart as RechartsLineChart, 
+  Line, 
+  PieChart as RechartsPieChart, 
+  Pie, 
+  Cell,
+  BarChart as RechartsBarChart,
+  Bar,
+  RadarChart as RechartsRadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts'
+
+// Chart colors - using CSS variables from :root
+const getChartColors = () => {
+  const style = getComputedStyle(document.documentElement)
+  return [
+    style.getPropertyValue('--primary-color').trim() || '#08b16e',
+    '#f59e0b', // amber
+    style.getPropertyValue('--btn-color').trim() || '#dd3737',
+    '#3b82f6', // blue
+    '#8b5cf6', // violet
+    style.getPropertyValue('--secondary-color').trim() || '#D5D5D5'
+  ]
+}
+
 // Category icons
 const Icons = {
   Food: () => (
@@ -54,18 +87,13 @@ const categoryColors = {
 
 // CategoryBreakdown Component
 // BEM: .category-breakdown
-// Elements: __item, __icon, __info, __name, __count, __amount, __percentage, __bar, __bar-fill
 export function CategoryBreakdown({ categories = [] }) {
-  // Calculate total
-  const total = categories.reduce((sum, cat) => sum + cat.amount, 0)
-
   return (
     <div className="category-breakdown">
       {categories.map((category, index) => {
         const IconComponent = categoryIcons[category.name] || Icons.Other
         const color = categoryColors[category.name] || 'other'
-        const percentage = total > 0 ? ((category.amount / total) * 100).toFixed(0) : 0
-
+        
         return (
           <div key={index} className="category-breakdown__item">
             {/* Icon */}
@@ -81,17 +109,17 @@ export function CategoryBreakdown({ categories = [] }) {
 
             {/* Amount */}
             <span className="category-breakdown__amount">
-              ${category.amount.toFixed(2)}
+              ${category.amount?.toFixed(2) || '0.00'}
             </span>
 
             {/* Percentage */}
-            <span className="category-breakdown__percentage">{percentage}%</span>
+            <span className="category-breakdown__percentage">{category.percentage || 0}%</span>
 
             {/* Progress Bar */}
             <div className="category-breakdown__bar">
               <div 
                 className="category-breakdown__bar-fill" 
-                style={{ width: `${percentage}%` }}
+                style={{ width: `${category.percentage || 0}%` }}
               />
             </div>
           </div>
@@ -101,14 +129,24 @@ export function CategoryBreakdown({ categories = [] }) {
   )
 }
 
-// ChartPlaceholder Component
+// ChartPlaceholder Component using Recharts
 // BEM: .charts-section, .chart-grid, .chart-card
-// Elements: __header, __title, __tabs, __tab, __content, __placeholder
 export function ChartPlaceholder({ 
   title = 'Spending Overview',
-  subtitle,
-  type = 'bar' // 'bar' or 'donut'
+  monthlyData = [],
+  categoryData = [],
+  isLoading = false
 }) {
+  // Get chart colors from CSS variables
+  const colors = getChartColors()
+  
+  // Prepare data for charts
+  const pieData = categoryData.slice(0, 5).map((item, index) => ({
+    name: item.name,
+    value: item.amount,
+    percentage: item.percentage
+  }))
+
   return (
     <section className="charts-section">
       {/* Header */}
@@ -116,56 +154,175 @@ export function ChartPlaceholder({
         <h2 className="charts-section__title">{title}</h2>
       </div>
 
-      {/* Chart Grid */}
-      <div className="chart-grid">
-        {/* Bar Chart */}
+      {/* Chart Grid - 4 columns */}
+      <div className="chart-grid chart-grid--2-cols">
+        {/* Line Chart - Monthly Spending */}
         <div className="chart-card">
           <div className="chart-card__header">
             <h3 className="chart-card__title">Monthly Spending</h3>
           </div>
           <div className="chart-card__content">
-            <div className="bar-chart">
-              {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month, i) => (
-                <div 
-                  key={month} 
-                  className="bar-chart__bar"
-                  style={{ height: `${30 + Math.random() * 60}%` }}
-                  data-label={month}
-                >
-                  <span className="bar-chart__value">${100 + Math.floor(Math.random() * 400)}</span>
-                </div>
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="chart-card__loading">Loading...</div>
+            ) : monthlyData.length > 1 ? (
+              <ResponsiveContainer width="100%" height={180}>
+                <RechartsLineChart data={monthlyData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+                  <XAxis 
+                    dataKey="month" 
+                    tick={{ fontSize: 10, fill: '#4B5563' }}
+                    tickFormatter={(value) => value?.split(' ')[0] || ''}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 10, fill: '#4B5563' }}
+                    tickFormatter={(value) => `$${value}`}
+                  />
+                  <Tooltip 
+                    formatter={(value) => [`$${value.toFixed(2)}`, 'Amount']}
+                    labelStyle={{ color: '#111827' }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="amount" 
+                    stroke="#08b16e" 
+                    strokeWidth={2}
+                    dot={{ fill: '#08b16e', strokeWidth: 2 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </RechartsLineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="chart-card__placeholder">
+                <span className="chart-card__placeholder-text">Need more data for line chart</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Donut Chart */}
+        {/* Pie Chart - Category Distribution */}
         <div className="chart-card">
           <div className="chart-card__header">
             <h3 className="chart-card__title">Category Distribution</h3>
           </div>
           <div className="chart-card__content">
-            <div className="donut-chart">
-              <div className="donut-chart__center">
-                <span className="donut-chart__value">$2,450</span>
-                <span className="donut-chart__label">Total</span>
+            {isLoading ? (
+              <div className="chart-card__loading">Loading...</div>
+            ) : categoryData.length > 0 ? (
+              <>
+                <ResponsiveContainer width="100%" height={180}>
+                  <RechartsPieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={70}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+                  </RechartsPieChart>
+                </ResponsiveContainer>
+                {/* Legend */}
+                <div className="chart-card__legend">
+                  {pieData.map((cat, i) => (
+                    <div key={i} className="chart-card__legend-item">
+                      <span 
+                        className="chart-card__legend-dot" 
+                        style={{ background: colors[i % colors.length] }}
+                      />
+                      {cat.name} ({cat.percentage}%)
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="chart-card__placeholder">
+                <span className="chart-card__placeholder-text">No data available</span>
               </div>
-            </div>
-            {/* Legend */}
-            <div className="chart-card__legend">
-              <div className="chart-card__legend-item">
-                <span className="chart-card__legend-dot" style={{ background: '#08b16e' }}></span>
-                Food (45%)
+            )}
+          </div>
+        </div>
+
+        {/* Radar Chart - Monthly Number of Expenses */}
+        <div className="chart-card">
+          <div className="chart-card__header">
+            <h3 className="chart-card__title">Monthly Transactions</h3>
+          </div>
+          <div className="chart-card__content">
+            {isLoading ? (
+              <div className="chart-card__loading">Loading...</div>
+            ) : monthlyData.length > 2 ? (
+              <ResponsiveContainer width="100%" height={180}>
+                <RechartsRadarChart cx="50%" cy="50%" outerRadius="70%" data={monthlyData}>
+                  <PolarGrid stroke="#eee" />
+                  <PolarAngleAxis 
+                    dataKey="month" 
+                    tick={{ fontSize: 10, fill: '#4B5563' }}
+                    tickFormatter={(value) => value?.split(' ')[0] || ''}
+                  />
+                  <PolarRadiusAxis 
+                    tick={{ fontSize: 10, fill: '#4B5563' }}
+                  />
+                  <Radar
+                    name="Transactions"
+                    dataKey="count"
+                    stroke="#08b16e"
+                    fill="#08b16e"
+                    fillOpacity={0.3}
+                  />
+                  <Tooltip />
+                </RechartsRadarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="chart-card__placeholder">
+                <span className="chart-card__placeholder-text">Need more data for radar</span>
               </div>
-              <div className="chart-card__legend-item">
-                <span className="chart-card__legend-dot" style={{ background: '#f59e0b' }}></span>
-                Transport (25%)
+            )}
+          </div>
+        </div>
+
+        {/* Bar Chart - Monthly Average Expenses */}
+        <div className="chart-card">
+          <div className="chart-card__header">
+            <h3 className="chart-card__title">Monthly Average</h3>
+          </div>
+          <div className="chart-card__content">
+            {isLoading ? (
+              <div className="chart-card__loading">Loading...</div>
+            ) : monthlyData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={180}>
+                <RechartsBarChart data={monthlyData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+                  <XAxis 
+                    dataKey="month" 
+                    tick={{ fontSize: 10, fill: '#4B5563' }}
+                    tickFormatter={(value) => value?.split(' ')[0] || ''}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 10, fill: '#4B5563' }}
+                    tickFormatter={(value) => `$${value}`}
+                  />
+                  <Tooltip 
+                    formatter={(value) => [`$${value.toFixed(2)}`, 'Average']}
+                    labelStyle={{ color: '#111827' }}
+                  />
+                  <Bar 
+                    dataKey={(data) => data.count > 0 ? data.amount / data.count : 0} 
+                    fill="#08b16e" 
+                    radius={[4, 4, 0, 0]}
+                  />
+                </RechartsBarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="chart-card__placeholder">
+                <span className="chart-card__placeholder-text">No data available</span>
               </div>
-              <div className="chart-card__legend-item">
-                <span className="chart-card__legend-dot" style={{ background: '#dd3737' }}></span>
-                Bills (15%)
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

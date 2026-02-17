@@ -173,8 +173,10 @@
     }
 
     &-info {
-      flex: 1;
-      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-start;
       opacity: 1;
       transition: opacity $transition-fast;
     }

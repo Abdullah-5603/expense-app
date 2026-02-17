@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import AppLayout from '@/components/Layout/AppLayout'
 import ExpenseList from '@/components/Expenses/ExpenseList'
 import ExpenseForm from '@/components/Expenses/ExpenseForm'
@@ -14,8 +14,10 @@ export default function ExpensesPage() {
   const { user, logout } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [expenses, setExpenses] = useState([])
+  const [total, setTotal] = useState(0)
   const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthYear())
   const [selectedCategory, setSelectedCategory] = useState('All')
+  const [availableMonths, setAvailableMonths] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
@@ -23,28 +25,66 @@ export default function ExpensesPage() {
   const [deletingId, setDeletingId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
 
+  // Fetch available months on mount
   useEffect(() => {
-    if (user?.email) {
-      fetchExpenses()
+    const fetchMonths = async () => {
+      try {
+        const response = await fetch('/api/expenses/months')
+        if (response.ok) {
+          const data = await response.json()
+          setAvailableMonths(data.months || [])
+        }
+      } catch (error) {
+        console.error('Error fetching months:', error)
+      }
     }
-  }, [user?.email, selectedMonth, selectedCategory])
+    fetchMonths()
+  }, [])
 
-  const fetchExpenses = async () => {
+  // Fetch expenses when month or category changes
+  const fetchExpenses = useCallback(async () => {
     if (!user?.email) return
     
     setIsLoading(true)
     try {
-      const response = await fetch(`/api/expenses?month=${selectedMonth}&email=${user.email}&category=${selectedCategory === 'All' ? '' : selectedCategory}`)
+      // Build query string
+      const params = new URLSearchParams()
+      params.append('month', selectedMonth)
+      params.append('email', user.email)
+      
+      // Only add category filter if not "All"
+      if (selectedCategory && selectedCategory !== 'All') {
+        params.append('category', selectedCategory)
+      }
+      
+      const response = await fetch(`/api/expenses?${params.toString()}`)
       if (response.ok) {
-        const { expenses: data, total } = await response.json()
-        setExpenses(data || [])
+        const data = await response.json()
+        setExpenses(data.expenses || [])
+        setTotal(data.total || 0)
+      } else {
+        console.error('Failed to fetch expenses')
+        setExpenses([])
+        setTotal(0)
       }
     } catch (error) {
       console.error('Error fetching expenses:', error)
+      setExpenses([])
+      setTotal(0)
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [user?.email, selectedMonth, selectedCategory])
+
+  useEffect(() => {
+    if (user?.email) {
+      fetchExpenses()
+    }
+  }, [fetchExpenses, user?.email])
+
+  // Get unique categories from current expenses for the filter
+  const categories = [...new Set(expenses.map(e => e.category))]
+  const allCategories = ['All', ...categories]
 
   const handleAddExpenseClick = () => {
     setEditingId(null)
@@ -63,11 +103,15 @@ export default function ExpensesPage() {
       })
       
       if (response.ok) {
-        const { expenses: newExpenses, total, monthYear } = await response.json()
-        setExpenses(newExpenses || [])
-        if (monthYear !== selectedMonth) {
-          setSelectedMonth(monthYear)
+        const result = await response.json()
+        setExpenses(result.expenses || [])
+        setTotal(result.total || 0)
+        
+        // Update month if expense was added to different month
+        if (result.monthYear && result.monthYear !== selectedMonth) {
+          setSelectedMonth(result.monthYear)
         }
+        
         setIsModalOpen(false)
       }
     } catch (error) {
@@ -93,14 +137,18 @@ export default function ExpensesPage() {
       })
       
       if (response.ok) {
-        const { expenses: newExpenses, total, monthYear } = await response.json()
-        setExpenses(newExpenses || [])
+        const result = await response.json()
+        setExpenses(result.expenses || [])
+        setTotal(result.total || 0)
+        
+        // Update month if expense was moved to different month
+        if (result.monthYear && result.monthYear !== selectedMonth) {
+          setSelectedMonth(result.monthYear)
+        }
+        
         setEditingId(null)
         setEditingExpense(null)
         setIsModalOpen(false)
-        if (monthYear !== selectedMonth) {
-          setSelectedMonth(monthYear)
-        }
       }
     } catch (error) {
       console.error('Error updating expense:', error)
@@ -121,8 +169,9 @@ export default function ExpensesPage() {
       })
       
       if (response.ok) {
-        const { expenses: newExpenses, total } = await response.json()
-        setExpenses(newExpenses || [])
+        const result = await response.json()
+        setExpenses(result.expenses || [])
+        setTotal(result.total || 0)
       }
     } catch (error) {
       console.error('Error deleting expense:', error)
@@ -146,11 +195,13 @@ export default function ExpensesPage() {
     }
   }
 
-  // Get unique categories
-  const categories = [...new Set(expenses.map(e => e.category))]
-  const allCategories = ['All', ...categories]
+  // Get expense being deleted for the confirmation modal
+  const getDeletingExpenseName = () => {
+    const expense = expenses.find(e => e._id === deletingId)
+    return expense?.name || 'this expense'
+  }
 
-  // Filter by search
+  // Filter by search query (client-side)
   const filteredExpenses = searchQuery
     ? expenses.filter(e => 
         e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -158,48 +209,86 @@ export default function ExpensesPage() {
       )
     : expenses
 
+  // Format month for display
+  const formatMonth = (month) => {
+    return month // Already formatted from API
+  }
+
   return (
     <AppLayout
-      title={`Expenses - ${selectedMonth}`}
+      title={`Expenses - ${formatMonth(selectedMonth)}`}
       user={user}
       onAddExpense={handleAddExpenseClick}
       onLogout={handleLogout}
       showAddButton={true}
     >
-      {/* Month Filter */}
-      <div style={{ marginBottom: '24px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+      {/* Filters */}
+      <div style={{ 
+        marginBottom: '24px', 
+        display: 'flex', 
+        gap: '12px', 
+        flexWrap: 'wrap',
+        alignItems: 'center'
+      }}>
+        {/* Month Selector */}
         <select
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
           style={{
-            padding: '8px 12px',
+            padding: '10px 16px',
             border: '1px solid var(--secondary-color)',
             borderRadius: '8px',
             background: 'white',
-            fontSize: '0.875rem'
+            fontSize: '0.875rem',
+            cursor: 'pointer',
+            minWidth: '160px'
           }}
         >
-          <option value="January 2026">January 2026</option>
-          <option value="December 2025">December 2025</option>
-          <option value="November 2025">November 2025</option>
-          <option value="October 2025">October 2025</option>
+          {availableMonths.length > 0 ? (
+            availableMonths.map(month => (
+              <option key={month} value={month}>{formatMonth(month)}</option>
+            ))
+          ) : (
+            <>
+              <option value="January 2026">January 2026</option>
+              <option value="December 2025">December 2025</option>
+              <option value="November 2025">November 2025</option>
+              <option value="October 2025">October 2025</option>
+            </>
+          )}
         </select>
 
+        {/* Category Filter */}
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
           style={{
-            padding: '8px 12px',
+            padding: '10px 16px',
             border: '1px solid var(--secondary-color)',
             borderRadius: '8px',
             background: 'white',
-            fontSize: '0.875rem'
+            fontSize: '0.875rem',
+            cursor: 'pointer',
+            minWidth: '140px'
           }}
         >
-          {allCategories.map(cat => (
+          <option value="All">All Categories</option>
+          {categories.map(cat => (
             <option key={cat} value={cat}>{cat}</option>
           ))}
         </select>
+
+        {/* Total display */}
+        <div style={{
+          marginLeft: 'auto',
+          padding: '8px 16px',
+          background: 'var(--gray-color)',
+          borderRadius: '8px',
+          fontSize: '0.875rem',
+          color: 'var(--secondary-text)'
+        }}>
+          Total: <strong style={{ color: 'var(--btn-color)' }}>${total.toFixed(2)}</strong>
+        </div>
       </div>
 
       {/* Expense List */}
@@ -208,9 +297,10 @@ export default function ExpensesPage() {
       ) : expenses.length === 0 ? (
         <EmptyState
           title="No expenses found"
-          description={selectedMonth !== getCurrentMonthYear() 
-            ? `No expenses found for ${selectedMonth}. Try selecting a different month.`
-            : "You haven't added any expenses this month."
+          description={
+            selectedMonth !== getCurrentMonthYear() || selectedCategory !== 'All'
+              ? `No expenses found for ${selectedMonth}${selectedCategory !== 'All' ? ` in ${selectedCategory}` : ''}. Try adjusting your filters.`
+              : "You haven't added any expenses this month."
           }
           actionLabel="Add Expense"
           onAction={handleAddExpenseClick}
@@ -246,9 +336,12 @@ export default function ExpensesPage() {
       {/* Delete Confirmation Modal */}
       <ConfirmDeleteModal
         isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
+        onClose={() => {
+          setIsDeleteModalOpen(false)
+          setDeletingId(null)
+        }}
         onConfirm={handleDelete}
-        itemName={editingExpense?.name}
+        itemName={getDeletingExpenseName()}
       />
     </AppLayout>
   )
