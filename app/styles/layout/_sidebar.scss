@@ -1,0 +1,266 @@
+// Sidebar Component
+// ==================
+// Navigation sidebar with logo, menu items, and active state indicator
+
+@import './variables';
+
+// BEM Block: sidebar
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: $spacing-lg 0;
+  overflow: hidden;
+
+  // Logo section
+  &__logo {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: 0 $spacing-lg;
+    margin-bottom: $spacing-2xl;
+    min-height: 48px;
+
+    &-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--primary-color);
+      border-radius: $radius-md;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      svg {
+        width: 20px;
+        height: 20px;
+        fill: white;
+      }
+    }
+
+    &-text {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--primary-text);
+      white-space: nowrap;
+      overflow: hidden;
+      opacity: 1;
+      transition: opacity $transition-fast;
+    }
+
+    // Collapsed state hides text
+    &--collapsed &__text {
+      opacity: 0;
+      width: 0;
+    }
+  }
+
+  // Navigation menu
+  &__nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    padding: 0 $spacing-md;
+    overflow-y: auto;
+  }
+
+  // Nav item
+  &__link {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-md $spacing-lg;
+    border-radius: $radius-md;
+    color: var(--secondary-text);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    position: relative;
+    transition: background $transition-fast, color $transition-fast;
+    min-height: 44px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+
+    &:hover {
+      background: var(--gray-color);
+      color: var(--primary-text);
+    }
+
+    &-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+      }
+    }
+
+    &-text {
+      white-space: nowrap;
+      overflow: hidden;
+      opacity: 1;
+      transition: opacity $transition-fast, width $transition-smooth;
+    }
+
+    // Active state indicator
+    &--active {
+      background: rgba(8, 177, 110, 0.08);
+      color: var(--primary-color);
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 24px;
+        background: var(--primary-color);
+        border-radius: 0 3px 3px 0;
+      }
+    }
+
+    // Collapsed state
+    &--collapsed {
+      justify-content: center;
+      padding: $spacing-md;
+
+      .sidebar__link-text {
+        opacity: 0;
+        width: 0;
+      }
+    }
+  }
+
+  // User section at bottom
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-lg;
+    border-top: 1px solid var(--secondary-color);
+    margin-top: auto;
+
+    &-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: $radius-full;
+      background: var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.875rem;
+      flex-shrink: 0;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    &-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-start;
+      opacity: 1;
+      transition: opacity $transition-fast;
+    }
+
+    &-name {
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: var(--primary-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &-email {
+      font-size: 0.75rem;
+      color: var(--secondary-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    // Collapsed state
+    &--collapsed {
+      justify-content: center;
+      padding: $spacing-md;
+
+      .sidebar__user-info {
+        opacity: 0;
+        width: 0;
+      }
+    }
+  }
+
+  // Collapse toggle button
+  &__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-sm;
+    padding: $spacing-md;
+    margin: $spacing-md;
+    border-radius: $radius-md;
+    border: 1px solid var(--secondary-color);
+    background: transparent;
+    color: var(--secondary-text);
+    cursor: pointer;
+    transition: background $transition-fast, color $transition-fast;
+    min-height: 40px;
+
+    &:hover {
+      background: var(--gray-color);
+      color: var(--primary-text);
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      transition: transform $transition-normal;
+    }
+
+    &--collapsed svg {
+      transform: rotate(180deg);
+    }
+
+    @include tablet {
+      display: none;
+    }
+  }
+}
+
+// Active indicator dot (for collapsed state)
+.sidebar__link--active .sidebar__link-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -8px;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: var(--primary-color);
+  border-radius: $radius-full;
+
+  @include tablet {
+    display: none;
+  }
+}

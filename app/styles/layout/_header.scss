@@ -1,0 +1,628 @@
+// Header Component
+// =================
+// Top navigation bar with title, actions, and profile menu
+// Mobile-first responsive design
+
+@import './variables';
+
+// Responsive breakpoints
+$breakpoint-sm: 360px;
+$breakpoint-md: 640px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+
+@mixin mobile-only {
+  @media (max-width: 639px) {
+    @content;
+  }
+}
+
+@mixin tablet-up {
+  @media (min-width: 640px) {
+    @content;
+  }
+}
+
+@mixin desktop-up {
+  @media (min-width: 1024px) {
+    @content;
+  }
+}
+
+// BEM Block: header
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  flex-wrap: wrap;
+
+  @include tablet-up {
+    gap: $spacing-lg;
+    padding: $spacing-lg;
+    flex-wrap: nowrap;
+  }
+
+  // Left section: page title and hamburger
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    flex: 0 1 auto;
+    min-width: 0;
+
+    @include tablet-up {
+      gap: $spacing-lg;
+    }
+  }
+
+  // Hamburger button
+  &__hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    border: none;
+    border-radius: $radius-md;
+    background: transparent;
+    color: var(--secondary-text);
+    cursor: pointer;
+    transition: background $transition-fast, color $transition-fast;
+    padding: 0;
+
+    svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    &:hover {
+      background: var(--gray-color);
+      color: var(--primary-text);
+    }
+
+    &:active {
+      background: var(--gray-color);
+    }
+
+    @include tablet-up {
+      display: none;
+    }
+  }
+
+  // Page title
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-text);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+
+    @include tablet-up {
+      font-size: 1.25rem;
+    }
+
+    @include desktop-up {
+      font-size: 1.5rem;
+    }
+
+    // Hide on very small screens
+    @media (max-width: 359px) {
+      display: none;
+    }
+  }
+
+  // Right section: actions
+  &__right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+    flex: 0 1 auto;
+    flex-shrink: 0;
+
+    @include tablet-up {
+      gap: $spacing-md;
+    }
+
+    @include desktop-up {
+      gap: $spacing-lg;
+    }
+  }
+
+  // Search (optional)
+  &__search {
+    position: relative;
+    display: none;
+    align-items: center;
+
+    @include desktop-up {
+      display: flex;
+    }
+
+    &-icon {
+      position: absolute;
+      left: $spacing-md;
+      width: 18px;
+      height: 18px;
+      fill: var(--secondary-text);
+      pointer-events: none;
+    }
+
+    &-input {
+      width: 240px;
+      padding: $spacing-sm $spacing-md $spacing-sm 40px;
+      border: 1px solid var(--secondary-color);
+      border-radius: $radius-full;
+      background: var(--gray-color);
+      font-size: 0.875rem;
+      color: var(--primary-text);
+      outline: none;
+      transition: border-color $transition-fast, box-shadow $transition-fast;
+
+      &::placeholder {
+        color: var(--secondary-text);
+      }
+
+      &:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(8, 177, 110, 0.1);
+      }
+    }
+  }
+
+  // Action buttons
+  &__action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+    border: none;
+    border-radius: $radius-md;
+    background: transparent;
+    color: var(--secondary-text);
+    cursor: pointer;
+    position: relative;
+    transition: background $transition-fast, color $transition-fast;
+    padding: 0;
+    flex-shrink: 0;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    &:hover {
+      background: var(--gray-color);
+      color: var(--primary-text);
+    }
+
+    &:active {
+      background: var(--gray-color);
+    }
+
+    // Primary action button (Add Expense)
+    &--primary {
+      width: auto;
+      min-width: 32px;
+      padding: 0 $spacing-sm;
+      gap: $spacing-xs;
+      background: var(--primary-color);
+      color: white;
+      font-size: 0.875rem;
+      font-weight: 500;
+      white-space: nowrap;
+
+      @include tablet-up {
+        padding: 0 $spacing-lg;
+        gap: $spacing-sm;
+      }
+
+      &:hover {
+        background: var(--primary-color);
+        filter: brightness(0.9);
+        color: white;
+      }
+
+      &:active {
+        filter: brightness(0.85);
+      }
+
+      svg {
+        fill: white;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    // Hide label on mobile, show on tablet+
+    &-label {
+      display: none;
+
+      @include tablet-up {
+        display: inline;
+      }
+    }
+
+    // Notification badge
+    &-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background: var(--btn-color);
+      border-radius: $radius-full;
+      border: 2px solid white;
+    }
+  }
+
+  // Profile button container
+  &__profile-container {
+    position: relative;
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  // Profile dropdown trigger
+  &__profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-xs;
+    padding: $spacing-xs $spacing-sm;
+    border: none;
+    border-radius: $radius-md;
+    background: transparent;
+    cursor: pointer;
+    transition: background $transition-fast;
+    min-width: 36px;
+    min-height: 36px;
+
+    @include tablet-up {
+      gap: $spacing-sm;
+      padding: $spacing-xs $spacing-md;
+    }
+
+    &:hover {
+      background: var(--gray-color);
+    }
+
+    &:active {
+      background: var(--gray-color);
+    }
+
+    // Avatar
+    &-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: $radius-full;
+      background: var(--primary-color);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.75rem;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    // Name label - hidden on mobile
+    &-name {
+      display: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--primary-text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 120px;
+
+      @include tablet-up {
+        display: inline;
+        max-width: 150px;
+      }
+
+      @include desktop-up {
+        max-width: 200px;
+      }
+    }
+
+    // Chevron icon
+    svg:last-child {
+      width: 16px;
+      height: 16px;
+      fill: var(--secondary-text);
+      transition: transform $transition-fast;
+      flex-shrink: 0;
+      display: none;
+
+      @include tablet-up {
+        display: block;
+      }
+    }
+
+    &--open svg:last-child {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+// Profile dropdown menu
+.profile-menu {
+  position: absolute;
+  top: calc(100% + $spacing-sm);
+  right: 0;
+  min-width: 200px;
+  background: white;
+  border: 1px solid var(--secondary-color);
+  border-radius: $radius-md;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: $spacing-sm;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity $transition-fast, transform $transition-fast, visibility $transition-fast;
+
+  @include mobile-only {
+    min-width: 180px;
+  }
+
+  &--open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-sm $spacing-md;
+    border-radius: $radius-sm;
+    color: var(--primary-text);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background $transition-fast, color $transition-fast;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    min-height: 40px;
+    touch-action: manipulation;
+
+    &:hover {
+      background: var(--gray-color);
+      color: var(--primary-text);
+    }
+
+    &:active {
+      background: var(--gray-color);
+    }
+
+    &--danger {
+      color: var(--btn-color);
+
+      &:hover {
+        background: rgba(231, 76, 60, 0.1);
+      }
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+  }
+
+  &__divider {
+    height: 1px;
+    background: var(--secondary-color);
+    margin: $spacing-sm 0;
+  }
+}
+
+// Month selector (inline in header)
+.month-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+  order: 3;
+  width: 100%;
+  margin-top: $spacing-sm;
+
+  @include tablet-up {
+    order: 2;
+    flex: 1;
+    width: auto;
+    margin-top: 0;
+    gap: $spacing-sm;
+    justify-content: center;
+  }
+
+  @include desktop-up {
+    gap: $spacing-md;
+  }
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    border: 1px solid var(--secondary-color);
+    border-radius: $radius-sm;
+    background: white;
+    color: var(--secondary-text);
+    cursor: pointer;
+    transition: background $transition-fast, border-color $transition-fast, color $transition-fast;
+    padding: 0;
+    flex-shrink: 0;
+    touch-action: manipulation;
+
+    @include tablet-up {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+    }
+
+    &:hover:not(:disabled) {
+      background: var(--gray-color);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    &:active:not(:disabled) {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: transparent;
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+  }
+
+  &__current {
+    padding: $spacing-xs $spacing-sm;
+    border: 1px solid var(--secondary-color);
+    border-radius: $radius-sm;
+    background: white;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--primary-text);
+    cursor: pointer;
+    min-width: 100px;
+    text-align: center;
+    transition: border-color $transition-fast, background $transition-fast;
+    touch-action: manipulation;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: $spacing-lg;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right $spacing-xs center;
+    background-size: 1.5em;
+    padding-right: $spacing-lg;
+
+    @include tablet-up {
+      font-size: 0.875rem;
+      min-width: 130px;
+      padding: $spacing-sm $spacing-md;
+    }
+
+    @include desktop-up {
+      min-width: 160px;
+    }
+
+    &:hover {
+      border-color: var(--primary-color);
+      background-color: var(--gray-color);
+    }
+
+    &:focus {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+      border-color: var(--primary-color);
+    }
+
+    &:active {
+      border-color: var(--primary-color);
+    }
+
+    option {
+      color: var(--primary-text);
+      background: white;
+      padding: $spacing-md;
+    }
+  }
+}
+
+// Very small screens (< 360px)
+@media (max-width: 359px) {
+  .header {
+    gap: $spacing-sm;
+    padding: $spacing-sm;
+
+    &__left {
+      gap: $spacing-sm;
+    }
+
+    &__right {
+      gap: $spacing-xs;
+    }
+
+    &__action--primary {
+      padding: 0;
+
+      .header__action-label {
+        display: none;
+      }
+    }
+  }
+
+  .month-selector {
+    &__current {
+      min-width: 85px;
+      font-size: 0.7rem;
+      padding: $spacing-xs;
+    }
+
+    &__btn {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      min-height: 32px;
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+
+  .header__profile {
+    padding: $spacing-xs;
+  }
+}
+
+// Print styles
+@media print {
+  .header {
+    display: none;
+  }
+}

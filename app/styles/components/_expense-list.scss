@@ -1,0 +1,368 @@
+// Expense List Component
+// ======================
+// Desktop table + mobile cards with BEM methodology
+
+@import '../layout/variables';
+
+// BEM Block: expense-section
+.expense-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  background: white;
+  border: 1px solid var(--secondary-color);
+  border-radius: $radius-lg;
+  overflow: hidden;
+
+  // Section header
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+    padding: $spacing-lg $spacing-xl;
+    border-bottom: 1px solid var(--secondary-color);
+    flex-wrap: wrap;
+  }
+
+  // Title
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-text);
+    margin: 0;
+  }
+
+  // Filter/controls
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+  }
+
+  // Search input
+  &__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    @include mobile {
+      width: 100%;
+      order: 3;
+    }
+
+    &-icon {
+      position: absolute;
+      left: $spacing-md;
+      width: 16px;
+      height: 16px;
+      fill: var(--secondary-text);
+      pointer-events: none;
+    }
+
+    &-input {
+      width: 200px;
+      padding: $spacing-sm $spacing-md $spacing-sm 36px;
+      border: 1px solid var(--secondary-color);
+      border-radius: $radius-sm;
+      background: var(--gray-color);
+      font-size: 0.875rem;
+      color: var(--primary-text);
+      outline: none;
+      transition: border-color $transition-fast, width $transition-normal;
+
+      @include mobile {
+        width: 100%;
+      }
+
+      &::placeholder {
+        color: var(--secondary-text);
+      }
+
+      &:focus {
+        border-color: var(--primary-color);
+        width: 240px;
+
+        @include mobile {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  // Filter dropdown
+  &__filter {
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid var(--secondary-color);
+    border-radius: $radius-sm;
+    background: var(--gray-color);
+    font-size: 0.875rem;
+    color: var(--primary-text);
+    cursor: pointer;
+    outline: none;
+    transition: border-color $transition-fast;
+
+    &:focus {
+      border-color: var(--primary-color);
+    }
+
+    @include mobile {
+      flex: 1;
+    }
+  }
+}
+
+// Desktop table view
+.expense-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  // Header
+  &__head {
+    background: var(--gray-color);
+    
+    th {
+      padding: $spacing-md $spacing-lg;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--secondary-text);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--secondary-color);
+      white-space: nowrap;
+    }
+  }
+
+  // Body
+  &__body {
+    tr {
+      border-bottom: 1px solid var(--secondary-color);
+      transition: background $transition-fast;
+
+      &:hover {
+        background: rgba(8, 177, 110, 0.02);
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    td {
+      padding: $spacing-lg;
+      font-size: 0.875rem;
+      color: var(--primary-text);
+      vertical-align: middle;
+    }
+  }
+
+  // Columns
+  &__date {
+    width: 100px;
+    color: var(--secondary-text);
+    font-weight: 500;
+  }
+
+  &__name {
+    font-weight: 500;
+    min-width: 150px;
+  }
+
+  &__category {
+    width: 120px;
+  }
+
+  &__amount {
+    width: 120px;
+    text-align: right;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__actions {
+    width: 100px;
+    text-align: right;
+  }
+
+  // Category badge
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-full;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: rgba(8, 177, 110, 0.1);
+    color: var(--primary-color);
+  }
+
+  // Amount variants
+  &__amount--income {
+    color: var(--primary-color);
+  }
+
+  &__amount--expense {
+    color: var(--btn-color);
+  }
+
+  // Action buttons
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: $radius-sm;
+    background: transparent;
+    color: var(--secondary-text);
+    cursor: pointer;
+    transition: background $transition-fast, color $transition-fast;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    &:hover {
+      background: var(--gray-color);
+    }
+
+    &--edit:hover {
+      color: var(--primary-color);
+    }
+
+    &--delete:hover {
+      color: var(--btn-color);
+    }
+  }
+
+  // Mobile: hide table, show cards instead
+  @include tablet {
+    display: none;
+  }
+}
+
+// Mobile card view (shown on tablet/mobile)
+.expense-cards {
+  display: none;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+
+  @include tablet {
+    display: flex;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    padding: $spacing-lg;
+    background: var(--gray-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: $radius-md;
+    transition: transform $transition-fast, box-shadow $transition-fast;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $spacing-sm;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    font-weight: 500;
+    color: var(--primary-text);
+    font-size: 0.9375rem;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+  }
+
+  &__date {
+    font-size: 0.75rem;
+    color: var(--secondary-text);
+  }
+
+  &__amount {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--btn-color);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__category {
+    display: inline-flex;
+    align-items: center;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-full;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    background: rgba(8, 177, 110, 0.1);
+    color: var(--primary-color);
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding-top: $spacing-sm;
+    border-top: 1px solid var(--secondary-color);
+    margin-top: $spacing-xs;
+  }
+
+  &__btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-xs;
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid var(--secondary-color);
+    border-radius: $radius-sm;
+    background: white;
+    color: var(--secondary-text);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background $transition-fast, border-color $transition-fast, color $transition-fast;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    &--edit:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    &--delete:hover {
+      border-color: var(--btn-color);
+      color: var(--btn-color);
+    }
+  }
+}

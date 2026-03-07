@@ -15,7 +15,7 @@
         max-width: 600px;
     }
     &__stat{
-        background: var(--background-light);
+        background: var(--gray-color);
         padding: 20px;
         border-radius: 8px;
         border-left: 4px solid var(--primary-color);
@@ -23,21 +23,21 @@
     &__stat-label{
         display: block;
         font-size: 0.9em;
-        color: var(--text-muted);
+        color: var(--secondary-text);
         margin-bottom: 5px;
     }
     &__stat-value{
         display: block;
         font-size: 1.5em;
         font-weight: bold;
-        color: var(--danger-color);
+        color: var(--btn-color);
     }
     &__category-select{
         width: 50%;
         padding: 4px 8px;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--secondary-color);
         border-radius: 4px;
-        color: var(--text-color);
+        color: var(--primary-text);
     }
 }
 

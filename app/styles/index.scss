@@ -1,0 +1,19 @@
+// Main SCSS Entry Point
+// ======================
+// Imports all partials in correct order
+
+// 1. Layout
+@import 'layout/variables';
+@import 'layout/dashboard-layout';
+@import 'layout/sidebar';
+@import 'layout/header';
+
+// 2. Components
+@import 'components/kpi-cards';
+@import 'components/charts';
+@import 'components/expense-list';
+@import 'components/modal';
+@import 'components/states';
+
+// 3. Utilities
+@import 'utils/animations';

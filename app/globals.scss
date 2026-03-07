@@ -1,256 +1,176 @@
-// Global variables (shared across blocks)
-$primary-color: #007bff;
-$danger-color: #d9534f;
-$success-color: #5cb85c;
-$border-color: #ddd;
-$background-light: #f8f9fa;
-$text-muted: #666;
-$shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-
 :root {
-  --primary-color: #007bff;
-  --secondary-color: #6c757d;
-  --danger-color: #d9534f;
-  --success-color: #5cb85c;
-  --border-color: #ddd;
-  --background-light: #f8f9fa;
-  --body-background: #f8f9fa;
-  --text-color: #212529;
-  --text-muted: #666;
-  --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    /* Brand Fonts */
+    --primary-font: "Inter", sans-serif;
+
+    /* Brand Colors */
+    --primary-color: #08b16e;    /* Use for: Active Nav, Primary Buttons, Success states */
+    --secondary-color: #D5D5D5;  /* Use for: Borders, Disabled states, Dividers */
+    --gray-color: #F9FAFB;       /* Use for: App Background, Card backgrounds */
+    
+    /* Action & Error Colors */
+    --btn-color: #dd3737;        /* Use for: Main Action Buttons (Delete/Logout/Expense) */
+    --error-color: #b31111;      /* Use for: Validation errors, Danger alerts */
+
+    /* Typography Colors */
+    --primary-text: #111827;     /* Use for: Headings, Main labels */
+    --secondary-text: #4B5563;   /* Use for: Descriptions, Sub-headings, Dates */
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-
-// Reset and base styles (not BEM, but foundational)
+/* Base / Reset (global, not BEM-specific) */
 * {
   box-sizing: border-box;
 }
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   margin: 0;
-  padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background-color: $background-light;
-  color: #333;
+  font-family: var(--primary-font);
+  background: var(--gray-color);
+  color: var(--primary-text);
 }
 
-// BEM Block: dashboard (main container)
-.dashboard {
-  max-width: 800px;
-  margin: 0 auto;
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: $shadow;
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
 }
 
-// BEM Element: dashboard__title
-.dashboard__title {
-  text-align: center;
-  color: $primary-color;
-  margin-bottom: 20px;
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
-// BEM Element: dashboard__total
-.dashboard__total {
-  font-size: 2.5em;
-  font-weight: bold;
-  color: $danger-color;
-  text-align: center;
-  margin: 20px 0;
-  padding: 10px;
-  background: #f9f9f9;
-  border-radius: 5px;
-  border-left: 5px solid $danger-color;
+/* Import main styles */
+@import './styles/index';
+
+/* Base / Reset (global, not BEM-specific) */
+* {
+  box-sizing: border-box;
 }
 
-// BEM Block: month-selector (monthly navigation)
-.month-selector {
-  display: flex;
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--primary-font);
+  background: var(--gray-color);
+  color: var(--primary-text);
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Shared UI primitives */
+.ui-card {
+  background: var(--gray-color);
+  border: 1px solid var(--secondary-color);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.ui-button {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
-  margin: 20px 0;
-}
-
-// BEM Element: month-selector__button
-.month-selector__button {
-  padding: 10px 15px;
-  border: 1px solid $border-color;
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &--disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  &:hover:not(.month-selector__button--disabled) {
-    background: #f5f5f5;
-  }
-}
-
-// BEM Element: month-selector__select
-.month-selector__select {
-  display: block;
-  padding: 10px;
-  font-size: 1em;
-  border: 1px solid $border-color;
-  border-radius: 4px;
-  background: white;
-  min-width: 200px;
-  margin: 0;
-}
-
-// BEM Block: expense-form (form for add/edit)
-.expense-form {
-  display: flex;
-  flex-direction: column;
   gap: 10px;
-  margin-bottom: 30px;
-}
-
-// BEM Element: expense-form__input
-.expense-form__input {
-  padding: 12px;
-  border: 1px solid $border-color;
-  border-radius: 4px;
-  font-size: 1em;
-
-  &--date {
-    // Modifier for date input if needed
-  }
-}
-
-// BEM Element: expense-form__button
-.expense-form__button {
-  padding: 12px;
-  border: none;
-  border-radius: 4px;
-  font-size: 1em;
+  border: 1px solid var(--secondary-color);
+  background: var(--gray-color);
+  color: var(--primary-text);
+  border-radius: 12px;
   cursor: pointer;
-  transition: opacity 0.2s;
+  padding: 10px 14px;
+  transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+  user-select: none;
 
-  &--primary {
-    background: $primary-color;
-    color: white;
-  }
-
-  &--secondary {
-    background: #6c757d;
-    color: white;
-  }
-
-  &--cancel {
-    background: #6c757d;
-    color: white;
+  &:active {
+    transform: translateY(1px);
   }
 
   &:hover {
-    opacity: 0.9;
+    box-shadow: var(--shadow);
+  }
+
+  &--primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  &--danger {
+    border-color: var(--btn-color);
+    color: var(--btn-color);
+  }
+
+  &--solid-primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--gray-color);
   }
 }
 
-// BEM Block: empty-state (for no expenses)
-.empty-state {
-  text-align: center;
-  color: $text-muted;
-  padding: 40px 20px;
-}
+.ui-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--secondary-color);
+  background: var(--gray-color);
+  border-radius: 12px;
+  padding: 10px 12px;
+  min-height: 42px;
 
-// Responsive modifiers (using BEM modifiers for media queries where applicable)
-@media (min-width: 600px) {
-  .expense-form {
-    flex-direction: row;
-    align-items: end;
-
-    .expense-form__input {
-      flex: 1;
-      margin-right: 10px;
-
-      &:last-of-type {
-        margin-right: 0;
-      }
-    }
-
-    .expense-form__button {
-      flex-shrink: 0;
-      white-space: nowrap;
-    }
-  }
-
-  .expense-list__item {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-
-    .expense-list__details {
-      flex: 1;
-      flex-direction: row;
-    }
-
-    .expense-list__actions {
-      margin-top: 0;
-    }
+  &__field {
+    border: none;
+    background: transparent;
+    width: 100%;
+    outline: none;
   }
 }
 
-@media (max-width: 768px) {
-  body {
-    padding: 10px;
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--secondary-color);
+  background: var(--gray-color);
+  color: var(--secondary-text);
+
+  &--success {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
   }
 
-  .dashboard {
-    padding: 15px;
-  }
-
-  .dashboard__total {
-    font-size: 2em;
-  }
-
-  .month-selector {
-    flex-direction: column;
-    gap: 10px;
-
-    .month-selector__select {
-      min-width: unset;
-      width: 100%;
-    }
-  }
-
-  .expense-list__item {
-    flex-direction: column !important;
-    align-items: stretch !important;
-
-    .expense-list__details {
-      flex-direction: column !important;
-      align-items: stretch !important;
-      gap: 10px !important;
-
-      .expense-list__date {
-        align-self: flex-start;
-      }
-
-      .expense-list__amount {
-        text-align: left !important;
-      }
-    }
-
-    .expense-list__actions {
-      justify-content: flex-end;
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .expense-form {
-    flex-direction: column !important;
-
-    .expense-form__input {
-      margin-right: 0 !important;
-      margin-bottom: 10px;
-    }
+  &--danger {
+    border-color: var(--btn-color);
+    color: var(--btn-color);
   }
 }
