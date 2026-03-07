@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 // Icons
 const Icons = {
@@ -46,6 +46,21 @@ const Icons = {
   )
 }
 
+// Convert "2026-03" to "March 2026"
+function formatMonthDisplay(monthStr) {
+  if (!monthStr || typeof monthStr !== 'string') return ''
+  
+  const [year, month] = monthStr.split('-')
+  const monthIndex = parseInt(month) - 1
+  
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ]
+  
+  return `${monthNames[monthIndex]} ${year}`
+}
+
 // Header Component
 // BEM: .header
 // Elements: __left, __title, __right, __search, __action, __profile
@@ -54,30 +69,66 @@ export default function Header({
   onMenuClick, 
   onAddExpense,
   onLogout,
+  onMonthChange,
   user,
-  showAddButton = true
+  showAddButton = true,
 }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const [selectedMonth, setSelectedMonth] = useState('January 2026')
-  
-  const months = ['January 2026', 'December 2025', 'November 2025', 'October 2025']
+  const [availableMonths, setAvailableMonths] = useState([])
+  const [selectedMonth, setSelectedMonth] = useState('')
+  const [isLoadingMonths, setIsLoadingMonths] = useState(true)
+
+  // Fetch available months from API
+  useEffect(() => {
+    const fetchMonths = async () => {
+      try {
+        setIsLoadingMonths(true)
+        const response = await fetch('/api/expenses/months')
+        if (response.ok) {
+          const data = await response.json()
+          const months = data.months || []
+          setAvailableMonths(months)
+          
+          // Set the first month as default if available
+          if (months.length > 0) {
+            setSelectedMonth(months[0])
+          }
+        } else {
+          console.error('Failed to fetch months')
+        }
+      } catch (error) {
+        console.error('Error fetching months:', error)
+      } finally {
+        setIsLoadingMonths(false)
+      }
+    }
+
+    fetchMonths()
+  }, [])
+
+  // Call parent's fetchExpenses when month changes
+  useEffect(() => {
+    if (selectedMonth && onMonthChange) {
+      onMonthChange(selectedMonth)
+    }
+  }, [selectedMonth, onMonthChange])
 
   const handlePrevMonth = () => {
-    const currentIndex = months.indexOf(selectedMonth)
-    if (currentIndex < months.length - 1) {
-      setSelectedMonth(months[currentIndex + 1])
+    const currentIndex = availableMonths.indexOf(selectedMonth)
+    if (currentIndex < availableMonths.length - 1) {
+      setSelectedMonth(availableMonths[currentIndex + 1])
     }
   }
 
   const handleNextMonth = () => {
-    const currentIndex = months.indexOf(selectedMonth)
+    const currentIndex = availableMonths.indexOf(selectedMonth)
     if (currentIndex > 0) {
-      setSelectedMonth(months[currentIndex - 1])
+      setSelectedMonth(availableMonths[currentIndex - 1])
     }
   }
 
-  const currentIndex = months.indexOf(selectedMonth)
-  const canGoPrev = currentIndex < months.length - 1
+  const currentIndex = availableMonths.indexOf(selectedMonth)
+  const canGoPrev = currentIndex < availableMonths.length - 1
   const canGoNext = currentIndex > 0
 
   return (
@@ -101,10 +152,10 @@ export default function Header({
       <div className="month-selector">
         <button 
           className="month-selector__btn"
-          onClick={handlePrevMonth}
-          disabled={!canGoPrev}
-          aria-label="Previous month"
-          title="Previous month"
+          onClick={handleNextMonth}
+          disabled={!canGoNext || isLoadingMonths}
+          aria-label="Next month (more recent)"
+          title="Next month (more recent)"
         >
           <Icons.ChevronLeft />
         </button>
@@ -114,18 +165,24 @@ export default function Header({
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
           aria-label="Select month"
+          disabled={isLoadingMonths || availableMonths.length === 0}
         >
-          {months.map(month => (
-            <option key={month} value={month}>{month}</option>
+          {availableMonths.length === 0 && (
+            <option value="">Loading months...</option>
+          )}
+          {availableMonths.map(month => (
+            <option key={month} value={month}>
+              {formatMonthDisplay(month)}
+            </option>
           ))}
         </select>
         
         <button 
           className="month-selector__btn"
-          onClick={handleNextMonth}
-          disabled={!canGoNext}
-          aria-label="Next month"
-          title="Next month"
+          onClick={handlePrevMonth}
+          disabled={!canGoPrev || isLoadingMonths}
+          aria-label="Previous month (older)"
+          title="Previous month (older)"
         >
           <Icons.ChevronRight />
         </button>

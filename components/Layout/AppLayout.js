@@ -14,6 +14,7 @@ export default function AppLayout({
   title = 'Dashboard',
   onAddExpense,
   onLogout,
+  onMonthChange,
   showAddButton = true
 }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -68,6 +69,7 @@ export default function AppLayout({
           onMenuClick={handleMenuClick}
           onAddExpense={onAddExpense}
           onLogout={onLogout}
+          onMonthChange={onMonthChange}
           user={user}
           showAddButton={showAddButton}
         />

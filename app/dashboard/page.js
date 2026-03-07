@@ -20,7 +20,7 @@ export default function DashboardPage() {
   const [categoryData, setCategoryData] = useState([])
   const [averageExpense, setAverageExpense] = useState(0)
   const [expenseCount, setExpenseCount] = useState(0)
-  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthYear())
+  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthYear());
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
@@ -28,7 +28,7 @@ export default function DashboardPage() {
   const [deletingId, setDeletingId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [monthlyIncome, setMonthlyIncome] = useState(null)
-  const [currentMonthExpenses, setCurrentMonthExpenses] = useState(0)
+  const [currentMonthExpenses, setCurrentMonthExpenses] = useState(0);
 
   // Fetch spending data for charts
   const fetchSpendingData = useCallback(async () => {
@@ -199,12 +199,18 @@ export default function DashboardPage() {
   // Show recent 5 expenses
   const recentExpenses = filteredExpenses.slice(0, 5)
 
+  // Handle month change from header
+  const handleMonthChange = (month) => {
+    setSelectedMonth(month)
+  }
+
   return (
     <AppLayout
       title="Dashboard"
       user={user}
       onAddExpense={handleAddExpenseClick}
       onLogout={handleLogout}
+      onMonthChange={handleMonthChange}
       showAddButton={true}
     >
       {/* Summary Section with Dynamic KPI Cards & Charts */}

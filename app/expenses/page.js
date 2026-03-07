@@ -17,29 +17,12 @@ export default function ExpensesPage() {
   const [total, setTotal] = useState(0)
   const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthYear())
   const [selectedCategory, setSelectedCategory] = useState('All')
-  const [availableMonths, setAvailableMonths] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [editingExpense, setEditingExpense] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
-
-  // Fetch available months on mount
-  useEffect(() => {
-    const fetchMonths = async () => {
-      try {
-        const response = await fetch('/api/expenses/months')
-        if (response.ok) {
-          const data = await response.json()
-          setAvailableMonths(data.months || [])
-        }
-      } catch (error) {
-        console.error('Error fetching months:', error)
-      }
-    }
-    fetchMonths()
-  }, [])
 
   // Fetch expenses when month or category changes
   const fetchExpenses = useCallback(async () => {
@@ -214,12 +197,18 @@ export default function ExpensesPage() {
     return month // Already formatted from API
   }
 
+  // Handle month change from header
+  const handleMonthChange = (month) => {
+    setSelectedMonth(month)
+  }
+
   return (
     <AppLayout
       title={`Expenses - ${formatMonth(selectedMonth)}`}
       user={user}
       onAddExpense={handleAddExpenseClick}
       onLogout={handleLogout}
+      onMonthChange={handleMonthChange}
       showAddButton={true}
     >
       {/* Filters */}
@@ -230,34 +219,6 @@ export default function ExpensesPage() {
         flexWrap: 'wrap',
         alignItems: 'center'
       }}>
-        {/* Month Selector */}
-        <select
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-          style={{
-            padding: '10px 16px',
-            border: '1px solid var(--secondary-color)',
-            borderRadius: '8px',
-            background: 'white',
-            fontSize: '0.875rem',
-            cursor: 'pointer',
-            minWidth: '160px'
-          }}
-        >
-          {availableMonths.length > 0 ? (
-            availableMonths.map(month => (
-              <option key={month} value={month}>{formatMonth(month)}</option>
-            ))
-          ) : (
-            <>
-              <option value="January 2026">January 2026</option>
-              <option value="December 2025">December 2025</option>
-              <option value="November 2025">November 2025</option>
-              <option value="October 2025">October 2025</option>
-            </>
-          )}
-        </select>
-
         {/* Category Filter */}
         <select
           value={selectedCategory}
