@@ -75,8 +75,8 @@ export default function ConfirmDeleteModal({
             margin: 0,
             fontSize: '1rem'
           }}>
-            "{itemName}"
-          </p>
+          &ldquo;{itemName}&rdquo;
+            </p>
         )}
       </div>
     </Modal>
