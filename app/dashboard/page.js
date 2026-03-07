@@ -27,6 +27,8 @@ export default function DashboardPage() {
   const [editingExpense, setEditingExpense] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [monthlyIncome, setMonthlyIncome] = useState(null)
+  const [currentMonthExpenses, setCurrentMonthExpenses] = useState(0)
 
   // Fetch spending data for charts
   const fetchSpendingData = useCallback(async () => {
@@ -34,6 +36,13 @@ export default function DashboardPage() {
     
     setIsLoading(true)
     try {
+      // Fetch monthly income
+      const incomeResponse = await fetch(`/api/settings/monthly-income?email=${user.email}`)
+      if (incomeResponse.ok) {
+        const incomeData = await incomeResponse.json()
+        setMonthlyIncome(incomeData.monthlyIncome)
+      }
+      
       // Fetch spending overview data
       const spendingResponse = await fetch(`/api/expenses/spending?email=${user.email}`)
       if (spendingResponse.ok) {
@@ -54,14 +63,17 @@ export default function DashboardPage() {
       if (response.ok) {
         const data = await response.json()
         setExpenses(data.expenses || [])
+        setCurrentMonthExpenses(data.total || 0)
       } else {
         setExpenses([])
+        setCurrentMonthExpenses(0)
       }
     } catch (error) {
       console.error('Error fetching data:', error)
       setExpenses([])
       setMonthlyData([])
       setCategoryData([])
+      setCurrentMonthExpenses(0)
     } finally {
       setIsLoading(false)
     }
@@ -204,6 +216,8 @@ export default function DashboardPage() {
         categories={categoryData}
         monthlyData={monthlyData}
         isLoading={isLoading}
+        monthlyIncome={monthlyIncome}
+        currentMonthExpenses={currentMonthExpenses}
       />
 
       {/* Recent Expenses */}

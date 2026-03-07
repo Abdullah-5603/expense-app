@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AppLayout from '@/components/Layout/AppLayout'
 import { useAuth } from '@/context/AuthContext'
 
@@ -9,6 +9,69 @@ export default function SettingsPage() {
   const [notifications, setNotifications] = useState(true)
   const [emailUpdates, setEmailUpdates] = useState(false)
   const [currency, setCurrency] = useState('USD')
+  const [monthlyIncome, setMonthlyIncome] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
+
+  // Fetch existing monthly income
+  useEffect(() => {
+    const fetchMonthlyIncome = async () => {
+      if (!user?.email) return
+      
+      try {
+        const response = await fetch(`/api/settings/monthly-income?email=${user.email}`)
+        if (response.ok) {
+          const data = await response.json()
+          if (data.monthlyIncome !== null) {
+            setMonthlyIncome(data.monthlyIncome.toString())
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching monthly income:', error)
+      }
+    }
+
+    fetchMonthlyIncome()
+  }, [user?.email])
+
+  // Handle monthly income update
+  const handleSaveMonthlyIncome = async () => {
+    if (!user?.email) return
+    
+    const income = parseFloat(monthlyIncome)
+    if (isNaN(income) || income < 0) {
+      alert('Please enter a valid non-negative number')
+      return
+    }
+
+    setIsLoading(true)
+    setSuccessMessage('')
+
+    try {
+      const response = await fetch('/api/settings/monthly-income', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          monthlyIncome: income
+        })
+      })
+
+      if (response.ok) {
+        setSuccessMessage('Monthly income updated successfully!')
+        // Clear success message after 3 seconds
+        setTimeout(() => setSuccessMessage(''), 3000)
+      } else {
+        const errorData = await response.json()
+        alert('Error: ' + (errorData.error || 'Failed to update monthly income'))
+      }
+    } catch (error) {
+      console.error('Error updating monthly income:', error)
+      alert('Error: Failed to update monthly income')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleLogout = async () => {
     try {
@@ -77,6 +140,84 @@ export default function SettingsPage() {
                 {user?.email || 'user@example.com'}
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* Monthly Income Section */}
+        <section style={{ marginBottom: '32px' }}>
+          <h2 style={{ 
+            fontSize: '1.125rem', 
+            fontWeight: '600', 
+            marginBottom: '16px',
+            color: 'var(--primary-text)'
+          }}>
+            Monthly Income
+          </h2>
+          
+          <div style={{
+            background: 'white',
+            border: '1px solid var(--secondary-color)',
+            borderRadius: '12px',
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px'
+          }}>
+            <div>
+              <p style={{ margin: '0 0 4px', fontWeight: '500', color: 'var(--primary-text)' }}>
+                Monthly Income
+              </p>
+              <p style={{ margin: 0, color: 'var(--secondary-text)', fontSize: '0.8125rem' }}>
+                Your monthly income for budgeting purposes
+              </p>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <input
+                type="number"
+                value={monthlyIncome}
+                onChange={(e) => setMonthlyIncome(e.target.value)}
+                placeholder="Enter your monthly income"
+                min="0"
+                step="1"
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  border: '1px solid var(--secondary-color)',
+                  borderRadius: '8px',
+                  fontSize: '0.9375rem',
+                  background: 'var(--gray-color)'
+                }}
+              />
+              <button
+                onClick={handleSaveMonthlyIncome}
+                disabled={isLoading}
+                style={{
+                  padding: '12px 24px',
+                  border: 'none',
+                  borderRadius: '8px',
+                  background: isLoading ? 'var(--secondary-color)' : 'var(--primary-color)',
+                  color: 'white',
+                  fontSize: '0.9375rem',
+                  fontWeight: '500',
+                  cursor: isLoading ? 'not-allowed' : 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              >
+                {isLoading ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+            
+            {successMessage && (
+              <p style={{ 
+                margin: 0, 
+                color: 'var(--success-color)', 
+                fontSize: '0.875rem',
+                fontWeight: '500'
+              }}>
+                {successMessage}
+              </p>
+            )}
           </div>
         </section>
 

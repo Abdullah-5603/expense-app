@@ -2,6 +2,16 @@
 
 // Icons
 const Icons = {
+  Income: () => (
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 21l-8-9h6V5h4v7h6l-8 9z"/>
+    </svg>
+  ),
+  Expenses: () => (
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 3l8 9h-6v9h-4v-9H4z"/>
+    </svg>
+  ),
   Wallet: () => (
     <svg viewBox="0 0 24 24" fill="currentColor">
       <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
@@ -53,7 +63,9 @@ const iconMap = {
   trendDown: Icons.TrendingDown,
   receipt: Icons.Receipt,
   category: Icons.Category,
-  percent: Icons.Percent
+  percent: Icons.Percent,
+  income: Icons.Income,
+  expenses: Icons.Expenses
 }
 
 // KpiCard Component

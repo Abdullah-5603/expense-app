@@ -54,10 +54,29 @@ const Icons = {
 // Default categories
 const defaultCategories = [
   { name: 'Food', icon: Icons.Food, color: 'food' },
+  { name: 'Groceries', icon: Icons.Groceries, color: 'groceries' },
   { name: 'Transport', icon: Icons.Transport, color: 'transport' },
+  { name: 'Fuel', icon: Icons.Fuel, color: 'fuel' },
   { name: 'Shopping', icon: Icons.Shopping, color: 'shopping' },
   { name: 'Bills', icon: Icons.Bills, color: 'bills' },
+  { name: 'Rent', icon: Icons.Rent, color: 'rent' },
+  { name: 'Utilities', icon: Icons.Utilities, color: 'utilities' },
+  { name: 'Internet', icon: Icons.Internet, color: 'internet' },
+  { name: 'Mobile', icon: Icons.Mobile, color: 'mobile' },
+  { name: 'Healthcare', icon: Icons.Healthcare, color: 'health' },
+  { name: 'Medicine', icon: Icons.Medicine, color: 'medicine' },
+  { name: 'Education', icon: Icons.Education, color: 'education' },
+  { name: 'Subscriptions', icon: Icons.Subscription, color: 'subscription' },
   { name: 'Entertainment', icon: Icons.Entertainment, color: 'entertainment' },
+  { name: 'Travel', icon: Icons.Travel, color: 'travel' },
+  { name: 'Gifts', icon: Icons.Gift, color: 'gift' },
+  { name: 'Personal Care', icon: Icons.PersonalCare, color: 'personal' },
+  { name: 'Insurance', icon: Icons.Insurance, color: 'insurance' },
+  { name: 'Savings', icon: Icons.Savings, color: 'savings' },
+  { name: 'Investments', icon: Icons.Investment, color: 'investment' },
+  { name: 'Taxes', icon: Icons.Taxes, color: 'taxes' },
+  { name: 'Pets', icon: Icons.Pets, color: 'pets' },
+  { name: 'Charity', icon: Icons.Charity, color: 'charity' },
   { name: 'Other', icon: Icons.More, color: 'other' }
 ]
 
@@ -88,6 +107,8 @@ export default function ExpenseForm({
     paymentMethod: 'Card'
   })
   const [errors, setErrors] = useState({})
+  const [categorySearch, setCategorySearch] = useState('')
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false)
 
   // Populate form when editing
   useEffect(() => {
@@ -101,6 +122,22 @@ export default function ExpenseForm({
       })
     }
   }, [initialData])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const dropdown = event.target.closest('.expense-form__select-wrap')
+      if (!dropdown && isCategoryDropdownOpen) {
+        setIsCategoryDropdownOpen(false)
+        setCategorySearch('')
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isCategoryDropdownOpen])
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -157,6 +194,106 @@ export default function ExpenseForm({
 
   return (
     <form className="expense-form" onSubmit={handleSubmit}>
+      <style jsx>{`
+        .expense-form__select-wrap {
+          position: relative;
+          width: 100%;
+        }
+        
+        .expense-form__select {
+          width: 100%;
+          padding: 12px;
+          border: 1px solid var(--secondary-color);
+          border-radius: 8px;
+          background: var(--gray-color);
+          color: var(--primary-text);
+          font-size: 0.9375rem;
+          cursor: pointer;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          transition: border-color 0.2s;
+        }
+        
+        .expense-form__select:hover {
+          border-color: var(--primary-color);
+        }
+        
+        .expense-form__select--open {
+          border-color: var(--primary-color);
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+        
+        .expense-form__select-value {
+          text-align: left;
+          flex: 1;
+        }
+        
+        .expense-form__select-arrow {
+          width: 20px;
+          height: 20px;
+          color: var(--secondary-text);
+          transition: transform 0.2s;
+        }
+        
+        .expense-form__select--open .expense-form__select-arrow {
+          transform: rotate(180deg);
+        }
+        
+        .expense-form__dropdown {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          border: 1px solid var(--secondary-color);
+          border-top: none;
+          border-bottom-left-radius: 8px;
+          border-bottom-right-radius: 8px;
+          background: white;
+          box-shadow: var(--shadow);
+          z-index: 100;
+          max-height: 300px;
+          overflow: hidden;
+        }
+        
+        .expense-form__dropdown-search {
+          width: 100%;
+          padding: 12px;
+          border: none;
+          border-bottom: 1px solid var(--secondary-color);
+          outline: none;
+          font-size: 0.875rem;
+        }
+        
+        .expense-form__dropdown-options {
+          max-height: 240px;
+          overflow-y: auto;
+        }
+        
+        .expense-form__dropdown-option {
+          padding: 12px;
+          cursor: pointer;
+          font-size: 0.875rem;
+          transition: background-color 0.2s;
+        }
+        
+        .expense-form__dropdown-option:hover {
+          background-color: var(--gray-color);
+        }
+        
+        .expense-form__dropdown-option--active {
+          background-color: var(--primary-color);
+          color: white;
+        }
+        
+        .expense-form__dropdown-no-results {
+          padding: 12px;
+          text-align: center;
+          color: var(--secondary-text);
+          font-size: 0.875rem;
+        }
+      `}</style>
       {/* Name */}
       <div className="expense-form__group">
         <label className="expense-form__label">Expense Name</label>
@@ -193,16 +330,58 @@ export default function ExpenseForm({
         {/* Category */}
         <div className="expense-form__group">
           <label className="expense-form__label">Category</label>
-          <select
-            className={`expense-form__select ${errors.category ? 'expense-form__input--error' : ''}`}
-            value={formData.category}
-            onChange={(e) => handleChange('category', e.target.value)}
-          >
-            <option value="">Select category</option>
-            {categories.map(cat => (
-              <option key={cat.name} value={cat.name}>{cat.name}</option>
-            ))}
-          </select>
+          {/* Searchable Category Dropdown */}
+          <div className="expense-form__select-wrap">
+            <div 
+              className={`expense-form__select ${errors.category ? 'expense-form__input--error' : ''} ${isCategoryDropdownOpen ? 'expense-form__select--open' : ''}`}
+              onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+            >
+              <span className="expense-form__select-value">
+                {formData.category || 'Select category'}
+              </span>
+              <svg className="expense-form__select-arrow" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+              </svg>
+            </div>
+            
+            {isCategoryDropdownOpen && (
+              <div className="expense-form__dropdown">
+                <input
+                  type="text"
+                  className="expense-form__dropdown-search"
+                  placeholder="Search categories..."
+                  value={categorySearch}
+                  onChange={(e) => setCategorySearch(e.target.value)}
+                  autoFocus
+                />
+                <div className="expense-form__dropdown-options">
+                  {categories.filter(cat => 
+                    cat.name.toLowerCase().includes(categorySearch.toLowerCase())
+                  ).map(cat => (
+                    <div
+                      key={cat.name}
+                      className={`expense-form__dropdown-option ${formData.category === cat.name ? 'expense-form__dropdown-option--active' : ''}`}
+                      onClick={() => {
+                        handleChange('category', cat.name)
+                        setIsCategoryDropdownOpen(false)
+                        setCategorySearch('')
+                      }}
+                    >
+                      {cat.name}
+                    </div>
+                  ))}
+                  
+                  {categories.filter(cat => 
+                    cat.name.toLowerCase().includes(categorySearch.toLowerCase())
+                  ).length === 0 && (
+                    <div className="expense-form__dropdown-no-results">
+                      No categories found
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
           {errors.category && <span className="expense-form__error">{errors.category}</span>}
         </div>
 

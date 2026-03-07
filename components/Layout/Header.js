@@ -38,6 +38,11 @@ const Icons = {
     <svg viewBox="0 0 24 24" fill="currentColor">
       <path d="M7 10l5 5 5-5z"/>
     </svg>
+  ),
+  LogOut: () => (
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+    </svg>
   )
 }
 
@@ -81,13 +86,12 @@ export default function Header({
       <div className="header__left">
         {/* Hamburger (mobile) */}
         <button 
-          className="dashboard-shell__hamburger"
+          className="header__hamburger"
           onClick={onMenuClick}
           aria-label="Toggle menu"
+          title="Toggle menu"
         >
-          <span></span>
-          <span></span>
-          <span></span>
+          <Icons.Menu />
         </button>
 
         <h1 className="header__title">{title}</h1>
@@ -100,6 +104,7 @@ export default function Header({
           onClick={handlePrevMonth}
           disabled={!canGoPrev}
           aria-label="Previous month"
+          title="Previous month"
         >
           <Icons.ChevronLeft />
         </button>
@@ -108,6 +113,7 @@ export default function Header({
           className="month-selector__current"
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
+          aria-label="Select month"
         >
           {months.map(month => (
             <option key={month} value={month}>{month}</option>
@@ -119,6 +125,7 @@ export default function Header({
           onClick={handleNextMonth}
           disabled={!canGoNext}
           aria-label="Next month"
+          title="Next month"
         >
           <Icons.ChevronRight />
         </button>
@@ -131,46 +138,59 @@ export default function Header({
           <button 
             className="header__action header__action--primary"
             onClick={onAddExpense}
+            title="Add Expense"
+            aria-label="Add Expense"
           >
             <Icons.Plus />
-            <span>Add Expense</span>
+            <span className="header__action-label">Add Expense</span>
           </button>
         )}
 
         {/* Notifications */}
-        <button className="header__action" aria-label="Notifications">
+        <button 
+          className="header__action" 
+          aria-label="Notifications"
+          title="Notifications"
+        >
           <Icons.Bell />
           <span className="header__action-badge"></span>
         </button>
 
         {/* Profile Dropdown */}
-        <button 
-          className={`header__profile ${showProfileMenu ? 'header__profile--open' : ''}`}
-          onClick={() => setShowProfileMenu(!showProfileMenu)}
-          aria-label="Profile menu"
-        >
-          <div className="header__profile-avatar">
-            {user?.photoURL ? (
-              <img src={user.photoURL} alt={user.displayName} />
-            ) : (
-              user?.email?.charAt(0).toUpperCase() || 'U'
-            )}
-          </div>
-          <span className="header__profile-name">{user?.displayName || 'User'}</span>
-          <Icons.ChevronDown />
-        </button>
+        <div className="header__profile-container">
+          <button 
+            className={`header__profile ${showProfileMenu ? 'header__profile--open' : ''}`}
+            onClick={() => setShowProfileMenu(!showProfileMenu)}
+            aria-label="Profile menu"
+            aria-expanded={showProfileMenu}
+          >
+            <div className="header__profile-avatar">
+              {user?.photoURL ? (
+                <img src={user.photoURL} alt={user.displayName} />
+              ) : (
+                user?.email?.charAt(0).toUpperCase() || 'U'
+              )}
+            </div>
+            <span className="header__profile-name">{user?.displayName || 'User'}</span>
+            <Icons.ChevronDown />
+          </button>
 
-        {/* Profile Menu Dropdown */}
-        {showProfileMenu && (
-          <div className="profile-menu profile-menu--open">
-            <button className="profile-menu__item" onClick={onLogout}>
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
-              </svg>
-              Logout
-            </button>
-          </div>
-        )}
+          {/* Profile Menu Dropdown */}
+          {showProfileMenu && (
+            <div className="profile-menu profile-menu--open">
+              <button 
+                className="profile-menu__item" 
+                onClick={() => {
+                  onLogout()
+                  setShowProfileMenu(false)
+                }}
+              >
+                <Icons.LogOut />
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   )

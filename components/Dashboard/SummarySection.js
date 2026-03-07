@@ -12,7 +12,9 @@ export default function SummarySection({
   topCategory = null,
   categories = [],
   monthlyData = [],
-  isLoading = false
+  isLoading = false,
+  monthlyIncome = null,
+  currentMonthExpenses = 0
 }) {
   if (isLoading) {
     return (
@@ -58,8 +60,38 @@ export default function SummarySection({
     )
   }
 
+  // Calculate remaining balance
+  const remainingBalance = monthlyIncome !== null ? monthlyIncome - currentMonthExpenses : null
+
   return (
     <>
+      {/* Monthly Income & Expenses Summary */}
+      {monthlyIncome !== null && (
+        <div className="kpi-grid">
+          <KpiCard
+            label="Monthly Income"
+            value={`${monthlyIncome.toFixed(2)}`}
+            subtitle="Current month"
+            icon="income"
+            variant="success"
+          />
+          <KpiCard
+            label="Monthly Expenses"
+            value={`${currentMonthExpenses.toFixed(2)}`}
+            subtitle="Current month"
+            icon="expenses"
+            variant="danger"
+          />
+          <KpiCard
+            label="Remaining Balance"
+            value={remainingBalance >= 0 ? `${remainingBalance.toFixed(2)}` : `-${Math.abs(remainingBalance).toFixed(2)}`}
+            subtitle={remainingBalance >= 0 ? 'Available' : 'Over budget'}
+            icon={remainingBalance >= 0 ? 'trendUp' : 'trendDown'}
+            variant={remainingBalance >= 0 ? 'success' : 'danger'}
+          />
+        </div>
+      )}
+
       {/* KPI Cards */}
       <KpiGrid>
         <KpiCard
