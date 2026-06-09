@@ -12,12 +12,15 @@ export async function GET(request) {
     
     const db = await connectDB()
     
-    // Get last 6 months of spending data
+    // Get recent expenses for spending trends and charts
     const expenses = await db.collection('all_expenses')
       .find({ email })
       .sort({ date: -1 })
       .limit(100)
       .toArray()
+
+    // Get total expense count directly from database
+    const expenseCount = await db.collection('all_expenses').countDocuments({ email })
     
     // Group by month
     const monthlySpending = {}
@@ -70,7 +73,7 @@ export async function GET(request) {
       monthlyData,
       categoryData,
       totalSpending,
-      expenseCount: expenses.length,
+      expenseCount,
       averageExpense: expenses.length > 0 ? totalSpending / expenses.length : 0
     })
   } catch (error) {
